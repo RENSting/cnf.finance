@@ -1,0 +1,40 @@
+﻿@using Cnf.Finance.Entity;
+@model IEnumerable<Organization>
+
+@{
+    ViewData["Title"] = "单位";
+}
+
+<h1>两金压降责任单位</h1>
+
+<p>
+    <a asp-action="CreateOrganization">新建单位</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.OrganizationId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrganizationId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.ActionLink("编辑", "EditOrganization", new { id=item.OrganizationId })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

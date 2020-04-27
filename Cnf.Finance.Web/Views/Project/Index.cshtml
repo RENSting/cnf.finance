@@ -1,0 +1,146 @@
+﻿@model ProjectListViewModel
+
+@{
+    ViewData["Title"] = "项目";
+    var allowAllOrgs = Helper.AllowAllOrgs(Context, out var allowedOrgId);
+}
+
+<h1>项目清单</h1>
+
+<p>
+    <a asp-action="Edit">添加新项目</a>
+</p>
+<div class="row mb-2">
+    <form method="post" asp-antiforgery="true" class="form-inline small">
+        <div class="form-group mr-2">
+            <label asp-for="SelectedOrgId" class="control-label mr-2"></label>
+            <select asp-for="SelectedOrgId" asp-items="@ViewBag.OrgList" class="form-control form-control-sm">
+                @if (allowAllOrgs)
+                {
+                    <option value="">-=全部=-</option>
+                }
+            </select>
+        </div>
+        <div class="form-group mr-2">
+            <label asp-for="SearchName" class="control-label mr-2"></label>
+            <input asp-for="SearchName" placeholder="模糊查询..." class="form-control form-control-sm" />
+        </div>
+        <div class="form-group form-check mr-2">
+            <label class="form-check-label">
+                <input class="form-check-input" asp-for="IncludeInActive" /> @Html.DisplayNameFor(model => model.IncludeInActive)
+            </label>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="筛选" class="btn btn-sm btn-primary" />
+        </div>
+    </form>
+</div>
+
+@if (Model.Projects == null || Model.Projects.Count() == 0)
+{
+    <div class="alert alert-secondary">
+        系统中暂时还没有任何满足条件的项目，请添加新项目或修改筛选条件试试。
+    </div>
+}
+else
+{
+    <table class="table table-sm table-bordered small">
+        <thead class="text-nowrap">
+            <tr>
+                <th rowspan="2">
+                    ID
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().Name)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ContractCode)
+                </th>
+                <th colspan="2">预计总收入和毛利</th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ProjectManager)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().OrganizationId)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().StartDate)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().EndDate)
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ProjectStatus)
+                </th>
+                <th rowspan="2">
+                    涉诉
+                </th>
+                <th rowspan="2">
+                    跟踪
+                </th>
+                <th rowspan="2">
+                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().CloseDate)
+                </th>
+                <th rowspan="2"></th>
+            </tr>
+            <tr>
+                <th>
+                    （万元）
+                </th>
+                <th>（%）</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Projects)
+            {
+            <tr @if (item.HasProblem) { @: class="table-danger"
+                }>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.ContractCode)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.ContractAmount)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.EstimatingProfit)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.ProjectManager)
+                </td>
+                <td>
+                    @Html.DisplayFor(m => item.OrganizationName)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.StartDate)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.ProjectStatus)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HasProblem)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ActiveStatus)
+                </td>
+                <td class="text-nowrap">
+                    @Html.DisplayFor(modelItem => item.CloseDate)
+                </td>
+                <td class="text-nowrap">
+                    @Html.ActionLink("修改", "Edit", new { id = item.ProjectId }) |
+                    @Html.ActionLink("管理", "Manage", new { id = item.ProjectId })
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+}

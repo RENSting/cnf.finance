@@ -1,0 +1,115 @@
+﻿@model Cnf.Finance.Entity.Project
+
+@{
+    ViewData["Title"] = "项目";
+}
+
+<div class="card">
+    <div class="card-header text-center">
+        <h4>
+            @if (Model.ProjectId > 0)
+            {
+                @Model.ShortName
+            }
+            else
+            {
+                <span class="text-primary">*</span>
+                @: 新项目
+            }
+            <a asp-action="Index" class="btn float-left">&lt;返回</a>
+        </h4>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(m => m.ProjectId)
+            <div class="form-group row">
+                <label asp-for="Name" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-10">
+                    <input asp-for="Name" class="form-control form-control-sm" placeholder="输入项目正式详细名称" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label asp-for="ShortName" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="ShortName" class="form-control form-control-sm" placeholder="不超过10个汉字的简称" />
+                    <span asp-validation-for="ShortName" class="text-danger"></span>
+                </div>
+                <label asp-for="ContractCode" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="ContractCode" class="form-control form-control-sm" placeholder="多份合同可以用分号隔开" />
+                    <span asp-validation-for="ContractCode" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label asp-for="OrganizationId" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <select asp-for="OrganizationId" asp-items="@ViewBag.OrgList" class="form-control form-control-sm"></select>
+                </div>
+                <label asp-for="ProjectManager" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="ProjectManager" class="form-control form-control-sm" placeholder="输入姓名..." />
+                    <span asp-validation-for="ProjectManager" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label asp-for="ContractAmount" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="ContractAmount" class="form-control form-control-sm" placeholder="请以万元为单位" />
+                    <span asp-validation-for="ContractAmount" class="text-danger"></span>
+                </div>
+                <label asp-for="EstimatingProfit" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="EstimatingProfit" class="form-control form-control-sm" placeholder="输入不带%的百分比" />
+                    <span asp-validation-for="EstimatingProfit" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label asp-for="StartDate" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="StartDate" class="form-control form-control-sm" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <label asp-for="EndDate" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="EndDate" class="form-control form-control-sm" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label asp-for="Status" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <select asp-for="Status" asp-items='new SelectList(ProjectViewModel.GetProjectStatus(), "Key", "Value")' class="form-control form-control-sm"></select>
+                </div>
+                <label asp-for="CloseDate" class="col-form-label col-form-label-sm col-sm-2"></label>
+                <div class="col-sm-4">
+                    <input asp-for="CloseDate" class="form-control form-control-sm" />
+                    <span asp-validation-for="CloseDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-4 offset-2">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="HasProblem" class="custom-control-input" />
+                        <label class="custom-control-label small" asp-for="HasProblem"></label>
+                    </div>
+                </div>
+                <div class="col-sm-4 offset-2">
+                    <div class="custom-control custom-checkbox">
+                        <input asp-for="ActiveStatus" class="custom-control-input" />
+                        <label class="custom-control-label small" asp-for="ActiveStatus"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <input type="submit" value="保存" class="btn btn-sm btn-primary offset-2 col-sm-4" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

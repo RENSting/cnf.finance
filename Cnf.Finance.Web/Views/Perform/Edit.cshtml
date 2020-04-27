@@ -1,0 +1,99 @@
+﻿@model Cnf.Finance.Web.Models.MonthPerformViewModel
+
+@{
+    ViewData["Title"] = "月报";
+}
+
+<div class="card">
+    <div class="card-header text-center">
+        <a asp-action="Index" class="small float-left">返回</a>
+        <h5>
+            @(Model.Year)年 @(Model.Month) 月 两金指标完成月报
+        </h5>
+    </div>
+    <div class="card-body">
+        <div class="form-group row mb-0">
+            <label asp-for="ProjectName" class="col-form-label col-form-label-sm col-2"></label>
+            <div class="col-10">
+                <input asp-for="ProjectName" class="form-control-plaintext form-control-sm" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label asp-for="ProjectIncoming" class="col-form-label col-form-label-sm col-2"></label>
+            <div class="col-4">
+                <input asp-for="ProjectIncoming" class="form-control-plaintext form-control-sm" />
+            </div>
+            <label asp-for="EstimatingProfit" class="col-form-label col-form-label-sm col-2"></label>
+            <div class="col-4">
+                <input asp-for="EstimatingProfit" class="form-control-plaintext form-control-sm" />
+            </div>
+        </div>
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(m => m.ProjectId)
+            @Html.HiddenFor(m => m.Year)
+            @Html.HiddenFor(m => m.Month)
+            <table class="table table-bordered text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th colspan="2"></th>
+                        <th>收入(万元)</th>
+                        <th>结算(万元)</th>
+                        <th>回款(万元)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="2">上年结转</td>
+                        <td>@Html.DisplayFor(m => m.IncomingBalance)</td>
+                        <td>@Html.DisplayFor(m => m.SettlementBalance)</td>
+                        <td>@Html.DisplayFor(m => m.RetrievableBalance)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="align-middle">当年累计<br />（不含本月）</td>
+                        <td>计划目标</td>
+                        <td>@Html.DisplayFor(m => m.TotalPlanIncoming)</td>
+                        <td>@Html.DisplayFor(m => m.TotalPlanSettlement)</td>
+                        <td>@Html.DisplayFor(m => m.TotalPlanRetrievable)</td>
+                    </tr>
+                    <tr>
+                        <td>实际完成</td>
+                        <td>@Html.DisplayFor(m => m.TotalIncoming)</td>
+                        <td>@Html.DisplayFor(m => m.TotalSettlement)</td>
+                        <td>@Html.DisplayFor(m => m.TotalRetrievalbe)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2" class="align-middle">本月数据<br />（@(Model.Year)年@(Model.Month)月）</td>
+                        <td>计划目标</td>
+                        <td>@Html.DisplayFor(m => m.PlanIncoming)</td>
+                        <td>@Html.DisplayFor(m => m.PlanSettlement)</td>
+                        <td>@Html.DisplayFor(m => m.PlanRetrievalbe)</td>
+                    </tr>
+                    <tr>
+                        <td>实际完成</td>
+                        <td class="p-1">
+                            <input asp-for="Incoming" class="form-control" placeholder="请输入..." />
+                            <span asp-validation-for="Incoming" class="text-danger small"></span>
+                        </td>
+                        <td class="p-1">
+                            <input asp-for="Settlement" class="form-control" placeholder="请输入..." />
+                            <span asp-validation-for="Settlement" class="text-danger small"></span>
+                        </td>
+                        <td class="p-1">
+                            <input asp-for="Retrievable" class="form-control" placeholder="请输入..." />
+                            <span asp-validation-for="Retrievable" class="text-danger small"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">保存</button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

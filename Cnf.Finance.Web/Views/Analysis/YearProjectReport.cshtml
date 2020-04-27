@@ -1,0 +1,166 @@
+﻿@model YearProjectReportViewModel
+
+@{
+    ViewData["Title"] = "项目报告";
+
+    var lastIncoming = Model.Project.AnnualBalance
+                            .Where(b => b.Year == Model.Year - 1 && BalanceCategory.Incoming == (BalanceCategory)b.BalanceCategory)
+                            .Sum(b => b.Balance);
+    var lastSettlement = Model.Project.AnnualBalance
+                            .Where(b => b.Year == Model.Year - 1 && BalanceCategory.Settlement == (BalanceCategory)b.BalanceCategory)
+                            .Sum(b => b.Balance);
+    var lastRetrieved = Model.Project.AnnualBalance
+                            .Where(b => b.Year == Model.Year - 1 && BalanceCategory.Retrievable == (BalanceCategory)b.BalanceCategory)
+                            .Sum(b => b.Balance);
+    var totalPlanStorage = lastIncoming - lastSettlement;
+    var totalPlanRecievable = lastSettlement - lastRetrieved;
+    var totalPerformStorage = totalPlanStorage;
+    var totalPerformRecievable = totalPlanRecievable;
+}
+
+<h4 class="text-center mb-4">
+    项目两金压降@(Model.Year)年度情况表（单位：万元）
+    <a asp-action="YearGroupReport" asp-controller="Analysis" class="float-left" style="font-size:small;"
+        asp-all-route-data='new Dictionary<string, string> {
+        {"GroupId", Model.OrgId.ToString() },
+        {"year", Model.Year.ToString() },
+        {"month", Model.Month.ToString() }
+    }'>返回上级</a>
+</h4>
+
+<table class="table table-sm table-bordered">
+    <thead class="thead-light">
+        <tr>
+            <th>项目名称</th>
+            <th colspan="10">@Model.Project.Name</th>
+        </tr>
+        <tr>
+            <th>项目工期</th>
+            <th colspan="10">
+                @string.Format("{0:yyyy年MM月dd日} - {1:yyyy年MM月dd日}", Model.Project.StartDate, Model.Project.EndDate)
+            </th>
+        </tr>
+        <tr>
+            <th>预计总收入</th>
+            <th colspan="10">
+                @string.Format("{0:#} 万元", Model.Project.ContractAmount)
+                @if (Model.Project.HasProblem)
+                {
+                    <span class="badge badge-danger">涉诉</span>
+                }
+                @switch ((ProjectStatus)Model.Project.Status)
+                {
+                    case ProjectStatus.Processing:
+                        <span class="badge badge-info">在建工程</span>
+                        break;
+                    case ProjectStatus.WaitForSettle:
+                        <span class="badge badge-warning">已完工未结算</span>
+                        break;
+                    case ProjectStatus.SettleCompleted:
+                        <span class="badge badge-success">已完工已结算</span>
+                        break;
+                    case ProjectStatus.Stopped:
+                        <span class="badge badge-danger">停工</span>
+                        break;
+                    default:
+                        <span class="badge badge-primary">未知状态</span>
+                        break;
+                }
+            </th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+        <tr class="bg-dark text-white">
+            <td></td>
+            <td colspan="2">收入</td>
+            <td colspan="2">结算</td>
+            <td colspan="2">回款</td>
+            <td colspan="2">存货</td>
+            <td colspan="2">应收</td>
+        </tr>
+        <tr>
+            <td>@string.Format("{0:0000}年结转", Model.Year)</td>
+            <td colspan="2">@string.Format("{0:#}", lastIncoming)</td>
+            <td colspan="2">@string.Format("{0:#}", lastSettlement)</td>
+            <td colspan="2">@string.Format("{0:#}", lastRetrieved)</td>
+            <td colspan="2">@string.Format("{0:#}", totalPlanStorage)</td>
+            <td colspan="2">@string.Format("{0:#}", totalPlanRecievable)</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td class="text-primary">计划</td>
+            <td class="text-success">完成</td>
+            <td class="text-primary">计划</td>
+            <td class="text-success">完成</td>
+            <td class="text-primary">计划</td>
+            <td class="text-success">完成</td>
+            <td class="text-primary">计划</td>
+            <td class="text-success">完成</td>
+            <td class="text-primary">计划</td>
+            <td class="text-success">完成</td>
+        </tr>
+        @for (var m = 1; m < 13; m++)
+        {
+            var planIncoming = Model.Project.Plan.Where(p => p.Year == Model.Year && p.Month == m).Sum(p => p.Incoming);
+            var planSettlement = Model.Project.Plan.Where(p => p.Year == Model.Year && p.Month == m).Sum(p => p.Settlement);
+            var planRetrived = Model.Project.Plan.Where(p => p.Year == Model.Year && p.Month == m).Sum(p => p.Retrieve);
+            var planStorage = planIncoming - planSettlement;
+            var planRecievable = planSettlement - planRetrived;
+            var performIncoming = Model.Project.Perform.Where(p => p.Year == Model.Year && p.Month == m).Sum(p => p.Incoming);
+            var performSettlement = Model.Project.Perform.Where(p => p.Year == Model.Year && p.Month == m).Sum(p => p.Settlement);
+            var performRetrived = Model.Project.Perform.Where(p => p.Year == Model.Year && p.Month == m).Sum(p => p.Retrieve);
+            var performStorage = performIncoming - performSettlement;
+            var performRecievable = performSettlement - performRetrived;
+            totalPlanStorage = totalPlanStorage + planStorage ?? 0M;
+            totalPlanRecievable = totalPlanRecievable + planRecievable ?? 0M;
+            totalPerformStorage = totalPerformStorage + performStorage ?? 0M;
+            totalPerformRecievable = totalPerformRecievable + performRecievable ?? 0M;
+            <tr>
+                <td>@string.Format("{0:0000}年{1:00}月", Model.Year, m)</td>
+                <td class="text-primary">@string.Format("{0:#}", planIncoming)</td>
+                <td class="text-success">@string.Format("{0:#}", performIncoming)</td>
+                <td class="text-primary">@string.Format("{0:#}", planSettlement)</td>
+                <td class="text-success">@string.Format("{0:#}", performSettlement)</td>
+                <td class="text-primary">@string.Format("{0:#}", planRetrived)</td>
+                <td class="text-success">@string.Format("{0:#}", performRetrived)</td>
+                <td class="text-primary">@string.Format("{0:#}", planStorage)</td>
+                <td class="text-success">@string.Format("{0:#}", performStorage)</td>
+                <td class="text-primary">@string.Format("{0:#}", planRecievable)</td>
+                <td class="text-success">@string.Format("{0:#}", performRecievable)</td>
+            </tr>
+        }
+        <tr class="bg-light text-dark">
+            <td><strong>合计</strong></td>
+            <td class="text-primary">
+                @string.Format("{0:#}", lastIncoming + Model.Project.Plan.Where(p => p.Year == Model.Year).Sum(p => p.Incoming))
+            </td>
+            <td class="text-success">
+                @string.Format("{0:#}", lastIncoming + Model.Project.Perform.Where(p => p.Year == Model.Year).Sum(p => p.Incoming))
+            </td>
+            <td class="text-primary">
+                @string.Format("{0:#}", lastSettlement + Model.Project.Plan.Where(p => p.Year == Model.Year).Sum(p => p.Settlement))
+            </td>
+            <td class="text-success">
+                @string.Format("{0:#}", lastSettlement + Model.Project.Perform.Where(p => p.Year == Model.Year).Sum(p => p.Settlement))
+            </td>
+            <td class="text-primary">
+                @string.Format("{0:#}", lastRetrieved + Model.Project.Plan.Where(p => p.Year == Model.Year).Sum(p => p.Retrieve))
+            </td>
+            <td class="text-success">
+                @string.Format("{0:#}", lastRetrieved + Model.Project.Perform.Where(p => p.Year == Model.Year).Sum(p => p.Retrieve))
+            </td>
+            <td class="text-primary">@string.Format("{0:#}", totalPlanStorage)</td>
+            <td class="text-success">@string.Format("{0:#}", totalPerformStorage)</td>
+            <td class="text-primary">@string.Format("{0:#}", totalPlanRecievable)</td>
+            <td class="text-success">@string.Format("{0:#}", totalPerformRecievable)</td>
+        </tr>
+    </tbody>
+</table>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $("div.container").attr("class", "container-fluid");
+        })
+    </script>
+}

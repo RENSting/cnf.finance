@@ -1,0 +1,43 @@
+﻿@model Cnf.Finance.Entity.Organization
+
+@{
+    ViewData["Title"] = "单位";
+}
+
+<h1>修改责任单位</h1>
+
+<h4>原名称:@Model.Name</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="EditOrganization">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="OrganizationId" class="control-label"></label>
+                <input asp-for="OrganizationId" class="form-control-plaintext" />
+                <span asp-validation-for="OrganizationId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" placeholder="输入不多于20个字的单位名称" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="保存" class="btn btn-primary" />
+            </div>
+            <div class="form-group">
+                <button asp-action="DeleteOrganization" asp-route-id="@Model.OrganizationId" class="btn btn-danger"
+                        onclick="if (confirm('准备删除此单位，此类操作不可恢复，确实要删除吗?') == false) return false;">删除</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Organizations">返回单位列表</a>
+</div>
+
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

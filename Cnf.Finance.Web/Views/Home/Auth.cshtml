@@ -1,0 +1,31 @@
+﻿@model AuthViewModel
+
+@{ 
+    ViewData["Title"] = "登录";
+}
+
+@if (Model.HasChecked)
+{
+    <div class="alert alert-danger">
+        用户名或口令不正确，请重新输入(或者该用户已经被停用)。
+    </div>
+}
+
+<div style="padding:30px; margin:auto; width:600px;">
+    <h4 class="text-center bg-primary text-white">欢迎使用“两金”管控系统，需要登录</h4>
+    <form method="post" style="background-color:lightgray;border-color:darkgrey; padding:20px;">
+        <div class="form-group">
+            @Html.LabelFor(m => m.UserName)
+            @Html.TextBoxFor(m => m.UserName, new { @class = "form-control", @placeholder = "输入登录账号" })
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.Password)
+            @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @type = "password", @placeholder = "输入登录口令" })
+        </div>
+        <div class="form-group">
+            <button asp-action="Auth" class="btn btn-lg btn-primary">现在验证</button>
+        </div>
+    </form>
+</div>
+

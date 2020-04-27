@@ -1,0 +1,101 @@
+﻿@model Cnf.Finance.Web.Models.UserViewModel
+
+@{
+    ViewData["Title"] = "用户";
+}
+
+<h4>
+    @if (Model.UserId <= 0)
+    {
+        <span class="text-danger">*</span>@:新建用户
+    }
+    else
+    {
+        @: 修改用户 <span class="border-bottom text-primary">@Model.UserName</span>
+    }
+</h4>
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="EditUser" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(m => m.UserId)
+        <div class="form-row">
+            <div class="form-group col-6">
+                <label asp-for="Login" class="control-label"></label>
+                <input asp-for="Login" class="form-control" />
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div>
+            @if (Model.UserId <= 0)
+            {
+                @Html.HiddenFor(m=>m.ActiveStatus)
+                <div class="form-group col-6">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                @Html.HiddenFor(m => m.Password)
+                <div class="form-group col-6">
+                    <label class="control-label">用户状态</label>
+                    <div>
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" asp-for="ActiveStatus" />
+                            <label asp-for="ActiveStatus" class="custom-control-label"></label>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+            <div class="form-row">
+                <div class="form-group col">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <input asp-for="UserName" class="form-control" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group col">
+                    <label asp-for="OrganizationId" class="control-label"></label>
+                    <select asp-for="OrganizationId" asp-items="@ViewBag.OrgList" class="form-control">
+                        <option value="">(所有单位)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Role" class="control-label"></label>
+                <div>
+                    <div class="custom-control custom-switch custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" asp-for="IsSystemAdmin">
+                        <label class="custom-control-label" asp-for="IsSystemAdmin">系统管理员</label>
+                    </div>
+                    <div class="custom-control custom-switch custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" asp-for="IsPlanner">
+                        <label class="custom-control-label" asp-for="IsPlanner">计划员</label>
+                    </div>
+                    <div class="custom-control custom-switch custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" asp-for="IsReporter">
+                        <label class="custom-control-label" asp-for="IsReporter">统计员</label>
+                    </div>
+                    <div class="custom-control custom-switch custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" asp-for="IsSupervisor">
+                        <label class="custom-control-label" asp-for="IsSupervisor">督导员</label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="保存" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div>
+    <a asp-action="Users">返回用户列表</a>
+</div>
+
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

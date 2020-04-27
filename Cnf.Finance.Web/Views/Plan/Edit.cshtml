@@ -1,0 +1,104 @@
+﻿@model YearRowViewModel
+
+@{
+    ViewData["Title"] = "计划";
+}
+
+<div class="card">
+    <div class="card-header text-center">
+        <a asp-action="Index" class="small float-left">返回</a>
+        <h5 class="m-0">
+            <span class="border-bottom mr-2">@(Model.ProjectName)</span>
+            @(Model.Year)年度 两金压降计划
+            <span class="badge badge-light float-right">@Html.DisplayFor(m => m.ProjectStatus)</span>
+        </h5>
+    </div>
+    <div class="card-body pt-0">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            @Html.HiddenFor(m => m.ProjectId)
+            @Html.HiddenFor(m => m.Year)
+            <div class="form-group row px-2 py-0 my-0">
+                <label asp-for="TotalIncoming" class="col-2 col-form-label"></label>
+                <input class="col-4 form-control-plaintext" asp-for="TotalIncoming"/>
+                <label asp-for="EstimatingProfit" class="col-2 col-form-label"></label>
+                <input class="col-4 form-control-plaintext" asp-for="EstimatingProfit" />
+            </div>
+            <table class="table table-sm table-bordered text-center">
+                <thead class="thead-dark">
+                    <tr>
+                        <th colspan="2"></th>
+                        <th>收入（万）</th>
+                        <th>结算（万）</th>
+                        <th>回款（万）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Balance != null)
+                    {
+                        <tr>
+                            <td colspan="2">上年结转</td>
+                            <td>@Html.DisplayFor(m => m.Balance.Incoming)</td>
+                            <td>@Html.DisplayFor(m => m.Balance.Settlement)</td>
+                            <td>@Html.DisplayFor(m => m.Balance.Retrievable)</td>
+                        </tr>
+                    }
+                    @for (var month = 1; month < 13; month++)
+                    {
+                        <tr>
+                            @if (month == 1)
+                            {
+                                <td rowspan="12" class="align-middle">
+                                    本<br />年<br />计<br />划
+                                </td>
+                            }
+                            <td>
+                                @Html.HiddenFor(m => m.MonthDataDic[month].Month)
+                                @string.Format("{0:00}月", month)
+                            </td>
+                            <td>
+                                <input asp-for="@Model.MonthDataDic[month].Incoming" class="form-control form-control-sm" />
+                                <span asp-validation-for="@Model.MonthDataDic[month].Incoming" class="text-danger small"></span>
+                            </td>
+                            <td>
+                                <input asp-for="@Model.MonthDataDic[month].Settlement" class="form-control form-control-sm" />
+                                <span asp-validation-for="@Model.MonthDataDic[month].Settlement" class="text-danger small"></span>
+                            </td>
+                            <td>
+                                <input asp-for="@Model.MonthDataDic[month].Retievable" class="form-control form-control-sm" />
+                                <span asp-validation-for="@Model.MonthDataDic[month].Retievable" class="text-danger small"></span>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="2"></td>
+                        <td colspan="3" class="text-left">
+                            <p class="text-muted small mb-2">
+                                小提示：您可以仅填写有非零值的输入框，然后点击“自动补零”按钮快速完成表单。
+                            </p>
+                            <div class="form-group mb-0">
+                                <button asp-action="Edit" class="btn btn-primary">保存</button>
+                                <button class="btn btn-success" type="button" onclick="fulfillZero();">自动补零</button>
+                                <button type="reset" class="btn btn-warning">重置</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script type="text/javascript">
+        function fulfillZero() {
+            $("input[type='text']").each(function () {
+                var v = $(this).val();
+                if (v == null || v == '')
+                    $(this).val('0');
+            })
+        }
+    </script>
+}

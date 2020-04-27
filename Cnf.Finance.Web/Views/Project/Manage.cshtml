@@ -1,0 +1,415 @@
+﻿
+@model ProjectManageViewModel
+@{
+    ViewData["Title"] = "项目";
+}
+
+<div class="card mb-2">
+    <div class="card-header text-center">
+        @if (Model.ActiveStatus)
+        {
+            <span class="badge badge-success float-right">进行中</span>
+        }
+        else
+        {
+            <span class="badge badge-warning float-right">已关闭</span>
+        }
+        <a asp-action="Index" class="float-left">&lt; 返回</a>
+        @Model.ShortName
+    </div>
+    <div class="card-body">
+        <div class="form-group row m-0">
+            <label class="col-form-label col-form-label-sm col-sm-2" asp-for="ProjectName"></label>
+            <div class="col-sm-10">
+                <input asp-for="ProjectName" class="form-control-plaintext" />
+            </div>
+        </div>
+        <div class="form-group row m-0">
+            <label class="col-form-label col-form-label-sm col-sm-2" asp-for="Amount"></label>
+            <div class="col-sm-10">
+                <input asp-for="Amount" class="form-control-plaintext" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-2">
+    <div class="card-body">
+        <h5 class="card-title">
+            年度结转两金数据（万元）
+            @if (Model.NextBalanceYear > 0)
+            {
+                <button type="button" class="btn btn-sm btn-primary float-right"
+                        title="" onclick="createNewBalance();">
+                    结转年度余额
+                </button>
+            }
+        </h5>
+        <p class="text-muted small">每个年度结束时，可以将上年度两金数据余额进行结转以便用于下年度</p>
+        @if (Model.AnnualBalances == null || Model.AnnualBalances.Count() == 0)
+        {
+            <div class="alert alert-secondary p-2">没有为项目生成年度结转余额</div>
+        }
+        else
+        {
+            <table class="table table-sm table-bordered">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th>@Html.DisplayNameFor(m => m.AnnualBalances.First().Year)</th>
+                        <th>@Html.DisplayNameFor(m => m.AnnualBalances.First().Incoming)</th>
+                        <th>@Html.DisplayNameFor(m => m.AnnualBalances.First().Settlement)</th>
+                        <th>@Html.DisplayNameFor(m => m.AnnualBalances.First().Retrievable)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var balance in Model.AnnualBalances)
+                    {
+                        <tr>
+                            <td data-balance-property="Year">@Html.DisplayFor(m => balance.Year)</td>
+                            <td data-balance-property="Incoming">@Html.DisplayFor(m => balance.Incoming)</td>
+                            <td data-balance-property="Settlement">@Html.DisplayFor(m => balance.Settlement)</td>
+                            <td data-balance-property="Retrievable">@Html.DisplayFor(m => balance.Retrievable)</td>
+                            <td class="pt-0">
+                                <button class="btn btn-sm text-primary p-0" style="vertical-align:middle;" onclick="editBalance(this);">修改</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <nav>
+            <div class="nav nav-tabs card-header-tabs" id="nav-tab" role="tablist">
+                <a class="nav-item nav-link" id="nav-settle-tab" data-toggle="tab" href="#nav-settle"
+                   role="tab" aria-controls="nav-settle" aria-selected="true">结算条件</a>
+                <a class="nav-item nav-link" id="nav-retrieve-tab" data-toggle="tab" href="#nav-retrieve"
+                   role="tab" aria-controls="nav-retrieve" aria-selected="false">回款条件</a>
+                <a class="nav-item nav-link" id="nav-others-tab" data-toggle="tab" href="#nav-others"
+                   role="tab" aria-controls="nav-others" aria-selected="false">综合付款条件</a>
+            </div>
+        </nav>
+    </div>
+    <div class="card-body">
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade" id="nav-settle" role="tabpanel" aria-labelledby="nav-settle-tab">
+                <p class="small text-muted">
+                    从合同中分析出来的可以向甲方进行结算的条款（仅结算）
+                </p>
+                @if (Model.SettleTerms == null || Model.SettleTerms.Count() == 0)
+                {
+                    <div class="alert alert-secondary p-2">没有分析结算条款</div>
+                }
+                else
+                {
+                    <table class="table table-sm small table-bordered">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th>@Html.DisplayNameFor(m => m.SettleTerms.First().OnDate)</th>
+                                <th>@Html.DisplayNameFor(m => m.SettleTerms.First().Amount)</th>
+                                <th>@Html.DisplayNameFor(m => m.SettleTerms.First().Provision)</th>
+                                <th>@Html.DisplayNameFor(m => m.SettleTerms.First().Remarks)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var terms in Model.SettleTerms)
+                            {
+                                <tr>
+                                    <td data-terms-property="OnDate">@Html.DisplayFor(m => terms.OnDate)</td>
+                                    <td data-terms-property="Amount">@Html.DisplayFor(m => terms.Amount)</td>
+                                    <td data-terms-property="Provision">@Html.DisplayFor(m => terms.Provision)</td>
+                                    <td data-terms-property="Remarks">@Html.DisplayFor(m => terms.Remarks)</td>
+                                    <td class="pt-0">
+                                        <button class="btn btn-sm text-primary p-0" style="vertical-align:middle;"
+                                                data-terms-id="@terms.TermsId" onclick="editTerms(this, 1);">
+                                            修改
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <div class="form-row">
+                    <button type="button" class="btn btn-sm btn-primary"
+                            title="" onclick="createNewTerms(1);">
+                        添加新结算条件
+                    </button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="nav-retrieve" role="tabpanel" aria-labelledby="nav-retrievable-tab">
+                <p class="small text-muted">
+                    从合同中分析出来的可以要求甲方支付的条款（仅回款）
+                </p>
+                @if (Model.RetrieveTerms == null || Model.RetrieveTerms.Count() == 0)
+                {
+                    <div class="alert alert-secondary p-2">没有分析回款条件</div>
+                }
+                else
+                {
+                    <table class="table table-sm small table-bordered">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th>@Html.DisplayNameFor(m => m.RetrieveTerms.First().OnDate)</th>
+                                <th>@Html.DisplayNameFor(m => m.RetrieveTerms.First().Amount)</th>
+                                <th>@Html.DisplayNameFor(m => m.RetrieveTerms.First().Provision)</th>
+                                <th>@Html.DisplayNameFor(m => m.RetrieveTerms.First().Remarks)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var terms in Model.RetrieveTerms)
+                            {
+                                <tr>
+                                    <td data-terms-property="OnDate">@Html.DisplayFor(m => terms.OnDate)</td>
+                                    <td data-terms-property="Amount">@Html.DisplayFor(m => terms.Amount)</td>
+                                    <td data-terms-property="Provision">@Html.DisplayFor(m => terms.Provision)</td>
+                                    <td data-terms-property="Remarks">@Html.DisplayFor(m => terms.Remarks)</td>
+                                    <td class="pt-0">
+                                        <button class="btn btn-sm text-primary p-0" style="vertical-align:middle;"
+                                                data-terms-id="@terms.TermsId" onclick="editTerms(this, 2);">
+                                            修改
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <div class="form-row">
+                    <button type="button" class="btn btn-sm btn-primary"
+                            title="" onclick="createNewTerms(2);">
+                        添加新回款条件
+                    </button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="nav-others" role="tabpanel" aria-labelledby="nav-others-tab">
+                <p class="small text-muted">
+                    从合同中分析出来的可以向甲方进行结算并要求付款的综合条款
+                </p>
+                @if (Model.OtherTerms == null || Model.OtherTerms.Count() == 0)
+                {
+                    <div class="alert alert-secondary p-2">没有分析综合支付条款</div>
+                }
+                else
+                {
+                    <table class="table table-sm small table-bordered">
+                        <thead class="bg-dark text-white">
+                            <tr>
+                                <th>@Html.DisplayNameFor(m => m.OtherTerms.First().OnDate)</th>
+                                <th>@Html.DisplayNameFor(m => m.OtherTerms.First().Amount)</th>
+                                <th>@Html.DisplayNameFor(m => m.OtherTerms.First().Provision)</th>
+                                <th>@Html.DisplayNameFor(m => m.OtherTerms.First().Remarks)</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var terms in Model.OtherTerms)
+                            {
+                                <tr>
+                                    <td data-terms-property="OnDate">@Html.DisplayFor(m => terms.OnDate)</td>
+                                    <td data-terms-property="Amount">@Html.DisplayFor(m => terms.Amount)</td>
+                                    <td data-terms-property="Provision">@Html.DisplayFor(m => terms.Provision)</td>
+                                    <td data-terms-property="Remarks">@Html.DisplayFor(m => terms.Remarks)</td>
+                                    <td class="pt-0">
+                                        <button class="btn btn-sm text-primary p-0" style="vertical-align:middle;"
+                                                data-terms-id="@terms.TermsId" onclick="editTerms(this, 3);">
+                                            修改
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <div class="form-row">
+                    <button type="button" class="btn btn-sm btn-primary"
+                            title="" onclick="createNewTerms(3);">
+                        添加新综合付款条件
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit Annual Balance -->
+<form method="post">
+    <div class="modal fade" id="dlgEditingBalance" data-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="编辑结转余额" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editingBalanceTitle"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.HiddenFor(m => m.EditingBalance.ProjectId, new { id = "editingBalanceProjectId" })
+                    @Html.HiddenFor(m => m.EditingBalance.Year, new { id = "editingBalanceYear" })
+                    <div class="form-group">
+                        <label asp-for="EditingBalance.Incoming"></label>
+                        <input asp-for="EditingBalance.Incoming" id="editingBalanceIncoming" class="form-control" />
+                        <span asp-validation-for="EditingBalance.Incoming" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EditingBalance.Settlement"></label>
+                        <input asp-for="EditingBalance.Settlement" id="editingBalanceSettlement" class="form-control" />
+                        <span asp-validation-for="EditingBalance.Settlement" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EditingBalance.Retrievable"></label>
+                        <input asp-for="EditingBalance.Retrievable" id="editingBalanceRetrievable" class="form-control" />
+                        <span asp-validation-for="EditingBalance.Retrievable" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button asp-action="SaveBalance" class="btn btn-primary">保存</button>
+                    <button asp-action="DeleteBalance" class="btn btn-danger"
+                            onclick="if (confirm('删除结转余额不可恢复，确实要删除吗?') == false) return false;">
+                        删除
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Model Edit Terms -->
+<form method="post">
+    <div class="modal fade" id="dlgEditingTerms" data-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="编辑合同条款" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editingTermsTitle">条款</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.HiddenFor(m => m.EditingTerms.ProjectId, new { id = "editingTermsProjectId" })
+                    @Html.HiddenFor(m => m.EditingTerms.TermsId, new { id = "editingTermsTermsId" })
+                    @Html.HiddenFor(m => m.EditingTerms.Category, new { id = "editingTermsCategory" })
+                    <div class="form-group">
+                        <label asp-for="EditingTerms.OnDate"></label>
+                        <input asp-for="EditingTerms.OnDate" id="editingTermsOnDate" class="form-control form-control-sm" />
+                        <span asp-validation-for="EditingTerms.OnDate" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EditingTerms.Amount"></label>
+                        <input asp-for="EditingTerms.Amount" id="editingTermsAmount" class="form-control form-control-sm"
+                               placeholder="填写到期可完成的金额（万元）" />
+                        <span asp-validation-for="EditingTerms.Amount" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EditingTerms.Provision"></label>
+                        <input asp-for="EditingTerms.Provision" id="editingTermsProvision" class="form-control form-control-sm"
+                               placeholder="填写合同中约定的条件" />
+                        <span asp-validation-for="EditingTerms.Provision" class="text-danger small"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="EditingTerms.Remarks"></label>
+                        <textarea asp-for="EditingTerms.Remarks" id="editingTermsRemarks" class="form-control form-control-sm"
+                                  rows="3" placeholder="可以在这里对条件做出附加的说明"></textarea>
+                        <span asp-validation-for="EditingTerms.Remarks" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button asp-action="SaveTerms" class="btn btn-primary">保存</button>
+                    <button asp-action="DeleteTerms" class="btn btn-danger"
+                            onclick="if (confirm('删除条款不可恢复，确实要删除吗?') == false) return false;">
+                        删除
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script type="text/javascript">
+        function createNewBalance() {
+            @if(Model.NextBalanceYear > 0)
+            {
+                <text>
+            $("#editingBalanceTitle").text("创建@(Model.NextBalanceYear)年度结转(万元)");
+            $("#editingBalanceProjectId").val(@Model.ProjectId);
+            $("#editingBalanceYear").val(@Model.NextBalanceYear);
+            $("#dlgEditingBalance").modal('show');
+                </text>
+            }
+            else
+            {
+                @: alert("当前不能结转上年度的两金余额");
+            }
+        }
+
+        function editBalance(tag) {
+            var tr = $(tag).parents("tr");
+            var year = tr.find("td[data-balance-property='Year']").text();
+            var incoming = tr.find("td[data-balance-property='Incoming']").text();
+            var settlement = tr.find("td[data-balance-property='Settlement']").text();
+            var retrievable = tr.find("td[data-balance-property='Retrievable']").text();
+            $("#editingBalanceTitle").text("修改" + year + "年度结转(万元)");
+            $("#editingBalanceProjectId").val(@Model.ProjectId);
+            $("#editingBalanceYear").val(year);
+            $("#editingBalanceIncoming").val(incoming);
+            $("#editingBalanceSettlement").val(settlement);
+            $("#editingBalanceRetrievable").val(retrievable);
+            $("#dlgEditingBalance").modal('show');
+        }
+
+        function createNewTerms(category) {
+            var title = category == 1 ? "结算条款" : category == 2 ? "回款条件" : "综合付款条件";
+            $("#editingTermsTitle").text("新建: " + title);
+            $("#editingTermsProjectId").val(@Model.ProjectId);
+            $("#editingTermsCategory").val(category == 1 ? "Settle" : category == 2 ? "Retrieve" : "Others");
+            $("#editingTermsTermsId").val("0");
+            $("#dlgEditingTerms").modal("show");
+        }
+
+        function editTerms(tag, category) {
+            var termsId = $(tag).data("terms-id");
+
+            var tr = $(tag).parents("tr");
+            var ondate = tr.find("td[data-terms-property='OnDate']").text();
+            var amount = tr.find("td[data-terms-property='Amount']").text();
+            var provision = tr.find("td[data-terms-property='Provision']").text();
+            var remarks = tr.find("td[data-terms-property='Remarks']").text();
+
+            var title = category == 1 ? "结算条款" : category == 2 ? "回款条件" : "综合付款条件";
+            $("#editingTermsTitle").text("修改: " + title);
+            $("#editingTermsProjectId").val(@Model.ProjectId);
+            $("#editingTermsCategory").val(category == 1 ? "Settle" : category == 2 ? "Retrieve" : "Others");
+            $("#editingTermsTermsId").val(termsId);
+            $("#editingTermsOnDate").val(ondate);
+            $("#editingTermsAmount").val(amount);
+            $("#editingTermsProvision").val(provision);
+            $("#editingTermsRemarks").val(remarks);
+
+            $("#dlgEditingTerms").modal("show");
+        }
+
+
+        $(function () {
+            var activeTabName = "nav-@ViewBag.ActiveTabName".toLowerCase();
+            var activeTabHeader = activeTabName + '-tab';
+            
+            $('#' + activeTabHeader).addClass('active');
+            $('#' + activeTabName).addClass('show active');
+        });
+
+    </script>
+}
