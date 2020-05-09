@@ -18,8 +18,14 @@ namespace Cnf.Finance.Entity
 
         public virtual YearReportBalance AnnualBalance { get; set; }
 
+        /// <summary>
+        /// 累计数
+        /// </summary>
         public virtual ReportItem Accumulation { get; set; }
 
+        /// <summary>
+        /// 当月数
+        /// </summary>
         public virtual ReportItem CurrentMonth { get; set; }
 
         public static YearGroupRecord Create(Organization organization, int year, int month) =>

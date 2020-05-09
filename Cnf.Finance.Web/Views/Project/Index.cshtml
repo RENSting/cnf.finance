@@ -5,12 +5,14 @@
     var allowAllOrgs = Helper.AllowAllOrgs(Context, out var allowedOrgId);
 }
 
-<h1>项目清单</h1>
+<div class="d-flex">
+    <h4>项目清单</h4>
 
-<p>
-    <a asp-action="Edit">添加新项目</a>
-</p>
-<div class="row mb-2">
+    <p>
+        <a class="ml-4" asp-action="Edit">添加新项目</a>
+    </p>
+</div>
+<div class="mb-2">
     <form method="post" asp-antiforgery="true" class="form-inline small">
         <div class="form-group mr-2">
             <label asp-for="SelectedOrgId" class="control-label mr-2"></label>
@@ -57,6 +59,7 @@ else
                     @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ContractCode)
                 </th>
                 <th colspan="2">预计总收入和毛利</th>
+                <th rowspan="2">税率</th>
                 <th rowspan="2">
                     @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ProjectManager)
                 </th>
@@ -93,54 +96,65 @@ else
         <tbody>
             @foreach (var item in Model.Projects)
             {
-            <tr @if (item.HasProblem) { @: class="table-danger"
-                }>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ProjectId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.ContractCode)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.ContractAmount)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.EstimatingProfit)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.ProjectManager)
-                </td>
-                <td>
-                    @Html.DisplayFor(m => item.OrganizationName)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.StartDate)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.EndDate)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.ProjectStatus)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.HasProblem)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ActiveStatus)
-                </td>
-                <td class="text-nowrap">
-                    @Html.DisplayFor(modelItem => item.CloseDate)
-                </td>
-                <td class="text-nowrap">
-                    @Html.ActionLink("修改", "Edit", new { id = item.ProjectId }) |
-                    @Html.ActionLink("管理", "Manage", new { id = item.ProjectId })
-                </td>
-            </tr>
+                <tr @if (item.HasProblem) { @: class="table-danger"
+                    }>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ProjectId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.ContractCode)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.ContractAmount)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.EstimatingProfit)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modeItem => item.TaxRate)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.ProjectManager)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(m => item.OrganizationName)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.StartDate)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.EndDate)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.ProjectStatus)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HasProblem)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ActiveStatus)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.DisplayFor(modelItem => item.CloseDate)
+                    </td>
+                    <td class="text-nowrap">
+                        @Html.ActionLink("修改", "Edit", new { id = item.ProjectId }) |
+                        @Html.ActionLink("管理", "Manage", new { id = item.ProjectId })
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
 
+}
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $("div.container").attr("class", "container-fluid");
+        })
+    </script>
 }

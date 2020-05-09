@@ -56,36 +56,50 @@ namespace Cnf.Finance.Api.Controllers
                                               where p.OrganizationId == org.OrganizationId
                                               select p.ProjectId;
                 //取上年结转
-                var balances = await (from b in _context.AnnualBalance
-                                   where b.Year == year - 1 && projectIds.Contains(b.ProjectId)
-                                   select b).ToListAsync();
+                var balanceQuery = _context.AnnualBalance.Include(b => b.Project)
+                                    .Where(b => b.Year == year - 1 && projectIds.Contains(b.ProjectId));
+
+                var balances = await balanceQuery.ToListAsync(); // await (from b in _context.AnnualBalance
+                                 //  where b.Year == year - 1 && projectIds.Contains(b.ProjectId)
+                                   //select b).ToListAsync();
                 report.AnnualBalance = new YearReportBalance();
                 report.AnnualBalance.Year = year - 1;
                 report.AnnualBalance.Incoming = balances.Where(b => b.BalanceCategory == 0).Sum(b => b.Balance);
                 report.AnnualBalance.Settlement = balances.Where(b => b.BalanceCategory == 1).Sum(b => b.Balance);
                 report.AnnualBalance.Retrievable = balances.Where(b => b.BalanceCategory == 2).Sum(b => b.Balance);
+                report.AnnualBalance.Tax = balances.Where(b => b.BalanceCategory == 1).Sum(b => ((decimal)b.Project.TaxRate * b.Balance));
 
                 report.Accumulation = new ReportItem();
                 report.CurrentMonth = new ReportItem();
-                var plans = await (from p in _context.Plan
-                                   where p.Year == year && projectIds.Contains(p.ProjectId)
-                                   select p).ToListAsync();
+                var planQuery = _context.Plan.Include(p => p.Project)
+                                .Where(p => p.Year == year && projectIds.Contains(p.ProjectId));
+                var plans = await planQuery.ToListAsync(); //await (from p in _context.Plan
+                              //     where p.Year == year && projectIds.Contains(p.ProjectId)
+                                //   select p).ToListAsync();
                 report.Accumulation.Plan.Incoming = plans.Sum(p => p.Incoming);
                 report.Accumulation.Plan.Settlement = plans.Sum(p => p.Settlement);
                 report.Accumulation.Plan.Retrievable = plans.Sum(p => p.Retrieve);
+                report.Accumulation.Plan.Tax = plans.Sum(p => (decimal)p.Project.TaxRate * p.Settlement);
+
                 report.CurrentMonth.Plan.Incoming = plans.Where(p => p.Month == month).Sum(p => p.Incoming);
                 report.CurrentMonth.Plan.Settlement = plans.Where(p => p.Month == month).Sum(p => p.Settlement);
                 report.CurrentMonth.Plan.Retrievable = plans.Where(p => p.Month == month).Sum(p => p.Retrieve);
+                report.CurrentMonth.Plan.Tax = plans.Where(p => p.Month == month).Sum(p => (decimal)p.Project.TaxRate * p.Settlement);
 
-                var performs = await (from p in _context.Perform
-                                   where p.Year == year && projectIds.Contains(p.ProjectId)
-                                   select p).ToListAsync();
+                var performQuery = _context.Perform.Include(p=>p.Project)
+                                    .Where(p => p.Year == year && projectIds.Contains(p.ProjectId));
+                var performs = await performQuery.ToListAsync(); //await (from p in _context.Perform
+                                 //  where p.Year == year && projectIds.Contains(p.ProjectId)
+                                   //select p).ToListAsync();
                 report.Accumulation.Perform.Incoming = performs.Sum(p => p.Incoming);
                 report.Accumulation.Perform.Settlement = performs.Sum(p => p.Settlement);
                 report.Accumulation.Perform.Retrievable = performs.Sum(p => p.Retrieve);
+                report.Accumulation.Perform.Tax = performs.Sum(p => (decimal)p.Project.TaxRate * p.Settlement);
+
                 report.CurrentMonth.Perform.Incoming = performs.Where(p => p.Month == month).Sum(p => p.Incoming);
                 report.CurrentMonth.Perform.Settlement = performs.Where(p => p.Month == month).Sum(p => p.Settlement);
                 report.CurrentMonth.Perform.Retrievable = performs.Where(p => p.Month == month).Sum(p => p.Retrieve);
+                report.CurrentMonth.Perform.Tax = performs.Where(p => p.Month == month).Sum(p => (decimal)p.Project.TaxRate * p.Settlement);
 
                 result.Add(report);
             }

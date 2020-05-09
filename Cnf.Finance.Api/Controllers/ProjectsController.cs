@@ -130,24 +130,29 @@ namespace Cnf.Finance.Api.Controllers
                     Year = year - 1,
                     Incoming = proj.AnnualBalance.Where(b => b.BalanceCategory == 0).Sum(b => b.Balance),
                     Settlement = proj.AnnualBalance.Where(b => b.BalanceCategory == 1).Sum(b => b.Balance),
-                    Retrievable = proj.AnnualBalance.Where(b => b.BalanceCategory == 2).Sum(b => b.Balance)
+                    Retrievable = proj.AnnualBalance.Where(b => b.BalanceCategory == 2).Sum(b => b.Balance),
                 };
+                report.AnnualBalance.Tax = (decimal)proj.TaxRate * report.AnnualBalance.Settlement;
 
                 report.Accumulation = new ReportItem();
                 report.CurrentMonth = new ReportItem();
                 report.Accumulation.Plan.Incoming = proj.Plan.Sum(p => p.Incoming);
                 report.Accumulation.Plan.Settlement = proj.Plan.Sum(p => p.Settlement);
                 report.Accumulation.Plan.Retrievable = proj.Plan.Sum(p => p.Retrieve);
+                report.Accumulation.Plan.Tax = (decimal)proj.TaxRate * report.Accumulation.Plan.Settlement;
                 report.CurrentMonth.Plan.Incoming = proj.Plan.Where(p => p.Month == month).Sum(p => p.Incoming);
                 report.CurrentMonth.Plan.Settlement = proj.Plan.Where(p => p.Month == month).Sum(p => p.Settlement);
                 report.CurrentMonth.Plan.Retrievable = proj.Plan.Where(p => p.Month == month).Sum(p => p.Retrieve);
+                report.CurrentMonth.Plan.Tax = (decimal)proj.TaxRate * report.CurrentMonth.Plan.Settlement;
 
                 report.Accumulation.Perform.Incoming = proj.Perform.Sum(p => p.Incoming);
                 report.Accumulation.Perform.Settlement = proj.Perform.Sum(p => p.Settlement);
                 report.Accumulation.Perform.Retrievable = proj.Perform.Sum(p => p.Retrieve);
+                report.Accumulation.Perform.Tax = (decimal)proj.TaxRate * report.Accumulation.Perform.Settlement;
                 report.CurrentMonth.Perform.Incoming = proj.Perform.Where(p => p.Month == month).Sum(p => p.Incoming);
                 report.CurrentMonth.Perform.Settlement = proj.Perform.Where(p => p.Month == month).Sum(p => p.Settlement);
                 report.CurrentMonth.Perform.Retrievable = proj.Perform.Where(p => p.Month == month).Sum(p => p.Retrieve);
+                report.CurrentMonth.Perform.Tax = (decimal)proj.TaxRate * report.CurrentMonth.Perform.Settlement;
 
                 result.Add(report);
             }

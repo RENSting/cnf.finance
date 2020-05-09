@@ -159,23 +159,52 @@ namespace Cnf.Finance.Web
             result.AnnualBalance.Incoming += record.AnnualBalance?.Incoming ?? 0M;
             result.AnnualBalance.Settlement += record.AnnualBalance?.Settlement ?? 0M;
             result.AnnualBalance.Retrievable += record.AnnualBalance?.Retrievable ?? 0M;
+            result.AnnualBalance.Tax += record.AnnualBalance?.Tax ?? 0M;
 
             result.Accumulation.Plan.Incoming = result.Accumulation.Plan.Incoming.AddNullableDecimal(record.Accumulation.Plan.Incoming);
             result.Accumulation.Plan.Settlement = result.Accumulation.Plan.Settlement.AddNullableDecimal(record.Accumulation.Plan.Settlement);
             result.Accumulation.Plan.Retrievable = result.Accumulation.Plan.Retrievable.AddNullableDecimal(record.Accumulation.Plan.Retrievable);
+            result.Accumulation.Plan.Tax = result.Accumulation.Plan.Tax.AddNullableDecimal(record.Accumulation.Plan.Tax);
             result.Accumulation.Perform.Incoming = result.Accumulation.Perform.Incoming.AddNullableDecimal(record.Accumulation.Perform.Incoming);
             result.Accumulation.Perform.Settlement = result.Accumulation.Perform.Settlement.AddNullableDecimal(record.Accumulation.Perform.Settlement);
             result.Accumulation.Perform.Retrievable = result.Accumulation.Perform.Retrievable.AddNullableDecimal(record.Accumulation.Perform.Retrievable);
+            result.Accumulation.Perform.Tax = result.Accumulation.Perform.Tax.AddNullableDecimal(record.Accumulation.Perform.Tax);
 
             result.CurrentMonth.Plan.Incoming = result.CurrentMonth.Plan.Incoming.AddNullableDecimal(record.CurrentMonth.Plan.Incoming);
             result.CurrentMonth.Plan.Settlement = result.CurrentMonth.Plan.Settlement.AddNullableDecimal(record.CurrentMonth.Plan.Settlement);
             result.CurrentMonth.Plan.Retrievable = result.CurrentMonth.Plan.Retrievable.AddNullableDecimal(record.CurrentMonth.Plan.Retrievable);
+            result.CurrentMonth.Plan.Tax = result.CurrentMonth.Plan.Tax.AddNullableDecimal(record.CurrentMonth.Plan.Tax);
             result.CurrentMonth.Perform.Incoming = result.CurrentMonth.Perform.Incoming.AddNullableDecimal(record.CurrentMonth.Perform.Incoming);
             result.CurrentMonth.Perform.Settlement = result.CurrentMonth.Perform.Settlement.AddNullableDecimal(record.CurrentMonth.Perform.Settlement);
             result.CurrentMonth.Perform.Retrievable = result.CurrentMonth.Perform.Retrievable.AddNullableDecimal(record.CurrentMonth.Perform.Retrievable);
+            result.CurrentMonth.Perform.Tax = result.CurrentMonth.Perform.Tax.AddNullableDecimal(record.CurrentMonth.Perform.Tax);
         }
 
-        public static decimal? AddNullableDecimal(this decimal? result, decimal? d) =>
-            d == null ? result : result == null ? d : result + d;
+        /// <summary>
+        /// 在based上加上一个nullable的数，返回和
+        /// </summary>
+        /// <param name="based"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static decimal? AddNullableDecimal(this decimal? based, decimal? d) =>
+            d == null ? based : based == null ? d : based + d;
+
+        /// <summary>
+        /// 在based上加上一个nullable的数，返回和
+        /// </summary>
+        /// <param name="based"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static decimal? AddNullableDecimal(this decimal based, decimal? d) =>
+            d == null ? based : based + d;
+
+        /// <summary>
+        /// 从based减去一个nullable的数，返回差
+        /// </summary>
+        /// <param name="based"></param>
+        /// <param name="d"></param>
+        /// <returns></returns>
+        public static decimal? SubstractNullableDecimal(this decimal? based, decimal? d) =>
+            d == null ? based : based == null ? -1 * d : based - d;
     }
 }

@@ -41,6 +41,11 @@ namespace Cnf.Finance.Entity
         [DisplayFormat(DataFormatString = "{0:#.##}")]
         public double? EstimatingProfit { get; set; }
 
+        [Display(Name = "税率")]
+        [DisplayFormat(DataFormatString = "{0:#.#%}")]
+        [Required(ErrorMessage = "必须为项目指定税率")]
+        public double? TaxRate { get; set; }
+
         [Display(Name="项目经理")]
         public string ProjectManager { get; set; }
 
