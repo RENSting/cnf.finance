@@ -29,8 +29,8 @@
         </div>
         <div class="form-group form-check mr-2">
             <label class="form-check-label">
-                <input class="form-check-input" asp-for="IncludeInActive" /> 
-                    @Html.DisplayNameFor(model => model.IncludeInActive)
+                <input class="form-check-input" asp-for="IncludeInActive" />
+                @Html.DisplayNameFor(model => model.IncludeInActive)
             </label>
         </div>
         <div class="form-group">
@@ -38,7 +38,7 @@
         </div>
     </form>
 </div>
-@if(Model.ProjectRowsDic == null || Model.ProjectRowsDic.Count == 0)
+@if (Model.ProjectRowsDic == null || Model.ProjectRowsDic.Count == 0)
 {
     <div class="alert alert-warning">
         没有满足条件的项目需要显示，请修改筛选条件或者在项目管理页面中添加新项目
@@ -49,106 +49,118 @@ else
     <table class="table table-sm table-bordered table-striped small text-center">
         <thead class="thead-dark">
             <tr>
-                <th rowspan="1" colspan="2">@Html.DisplayNameFor(m=>m.ProjectRowsDic[0].ProjectName)</th>
+                <th rowspan="1" colspan="2">@Html.DisplayNameFor(m => m.ProjectRowsDic[0].ProjectName)</th>
                 <th colspan="1">上年度结转</th>
-                @for(var month=1; month <13; month++)
+                @for (var month = 1; month < 13; month++)
                 {
-                    <th colspan="1">@string.Format("{0:0000}-{1:00}",Model.Year, month)</th>
+                    <th colspan="1">@string.Format("{0:0000}-{1:00}", Model.Year, month)</th>
                 }
             </tr>
         </thead>
         <tbody>
-            @foreach(var proj in Model.ProjectRowsDic.Values)
+            @foreach (var proj in Model.ProjectRowsDic.Values)
             {
-            <tr>
-                <td rowspan="3" class="text-nowrap">
-                    <a asp-action="Edit" asp-route-projectId="@proj.ProjectId" asp-route-year="@Model.Year">
-                        @Html.DisplayFor(m => proj.ProjectName)
-                    </a><br />
-                    @if(proj.HasProblem)
-                    {
-                        <span class="badge badge-danger">涉诉</span>
-                    }
-                    <span class='badge @(proj.ProjectStatus switch{
+                <tr>
+                    <td rowspan="3" class="text-nowrap">
+                        <a asp-action="Edit" asp-route-projectId="@proj.ProjectId" asp-route-year="@Model.Year">
+                            @Html.DisplayFor(m => proj.ProjectName)
+                        </a><br />
+                        @if (proj.HasProblem)
+                        {
+                            <span class="badge badge-danger">涉诉</span>
+                        }
+                        <span class='badge @(proj.ProjectStatus switch{
                                        ProjectStatus.Processing=> "badge-info",
                                        ProjectStatus.WaitForSettle => "badge-warning",
                                        ProjectStatus.SettleCompleted => "badge-success",
                                        ProjectStatus.Stopped => "badge-danger",
                                        _ => "badge-primary",
-                                   })'>@Html.DisplayFor(m=>proj.ProjectStatus)</span>
-                </td>
-                <td class="text-nowrap">收入</td>
-                @if (proj.Balance == null)
-                {
-                    <td class="text-nowrap"></td>
-                }
-                else
-                {
-                    <td class="text-nowrap">@Html.DisplayFor(m => proj.Balance.Incoming)</td>
-                }
-                @for (var month = 1; month < 13; month++)
-                {
-                    var monthData = proj.MonthDataDic[month];
-                    if (monthData == null)
-                    {
-                        //no plan on this month
-                        <td class="text-nowrap"></td>
+                                   })'>@Html.DisplayFor(m => proj.ProjectStatus)</span>
+                            </td>
+                            <td class="text-nowrap">收入</td>
+                            @if (proj.Balance == null)
+                            {
+                                <td class="text-nowrap"></td>
+                            }
+                            else
+                            {
+                                <td class="text-nowrap">@Html.DisplayFor(m => proj.Balance.Incoming)</td>
+                            }
+                            @for (var month = 1; month < 13; month++)
+                            {
+                                var monthData = proj.MonthDataDic[month];
+                                if (monthData == null)
+                                {
+                                    //no plan on this month
+                                    <td class="text-nowrap"></td>
+                                }
+                                else
+                                {
+                                    <td class="text-nowrap">
+                                        <a asp-action="Manage" asp-route-id="@monthData.Id">
+                                            @Html.DisplayFor(m => monthData.Incoming)
+                                        </a>
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            <td class="text-nowrap">结算</td>
+                            @if (proj.Balance == null)
+                            {
+                                <td class="text-nowrap"></td>
+                            }
+                            else
+                            {
+                                <td class="text-nowrap">@Html.DisplayFor(m => proj.Balance.Settlement)</td>
+                            }
+                            @for (var month = 1; month < 13; month++)
+                            {
+                                var monthData = proj.MonthDataDic[month];
+                                if (monthData == null)
+                                {
+                                    //no plan on this month
+                                    <td class="text-nowrap"></td>
+                                }
+                                else
+                                {
+                                    <td class="text-nowrap">
+                                        <a asp-action="Manage" asp-route-id="@monthData.Id">
+                                            @Html.DisplayFor(m => monthData.Settlement)
+                                        </a>
+                                    </td>
+                                }
+                            }
+                        </tr>
+                        <tr>
+                            <td class="text-nowrap">回款</td>
+                            @if (proj.Balance == null)
+                            {
+                                <td class="text-nowrap"></td>
+                            }
+                            else
+                            {
+                                <td class="text-nowrap">@Html.DisplayFor(m => proj.Balance.Retrievable)</td>
+                            }
+                            @for (var month = 1; month < 13; month++)
+                            {
+                                var monthData = proj.MonthDataDic[month];
+                                if (monthData == null)
+                                {
+                                    //no plan on this month
+                                    <td class="text-nowrap"></td>
+                                }
+                                else
+                                {
+                                    <td class="text-nowrap">
+                                        <a asp-action="Manage" asp-route-id="@monthData.Id">
+                                            @Html.DisplayFor(m => monthData.Retievable)
+                                        </a>
+                                    </td>
+                                }
+                            }
+                        </tr>
                     }
-                    else
-                    {
-                        <td class="text-nowrap">@Html.DisplayFor(m => monthData.Incoming)</td>
-                    }
-                }
-            </tr>
-            <tr>
-                <td class="text-nowrap">结算</td>
-                @if (proj.Balance == null)
-                {
-                    <td class="text-nowrap"></td>
-                }
-                else
-                {
-                    <td class="text-nowrap">@Html.DisplayFor(m => proj.Balance.Settlement)</td>
-                }
-                @for (var month = 1; month < 13; month++)
-                {
-                    var monthData = proj.MonthDataDic[month];
-                    if (monthData == null)
-                    {
-                        //no plan on this month
-                        <td class="text-nowrap"></td>
-                    }
-                    else
-                    {
-                        <td class="text-nowrap">@Html.DisplayFor(m => monthData.Settlement)</td>
-                    }
-                }
-            </tr>
-            <tr>
-                <td class="text-nowrap">回款</td>
-                @if (proj.Balance == null)
-                {
-                    <td class="text-nowrap"></td>
-                }
-                else
-                {
-                    <td class="text-nowrap">@Html.DisplayFor(m => proj.Balance.Retrievable)</td>
-                }
-                @for (var month = 1; month < 13; month++)
-                {
-                    var monthData = proj.MonthDataDic[month];
-                    if (monthData == null)
-                    {
-                        //no plan on this month
-                        <td class="text-nowrap"></td>
-                    }
-                    else
-                    {
-                        <td class="text-nowrap">@Html.DisplayFor(m => monthData.Retievable)</td>
-                    }
-                }
-            </tr>
-            }
         </tbody>
     </table>
 }

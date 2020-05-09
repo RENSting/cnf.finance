@@ -49,7 +49,7 @@ namespace Cnf.Finance.Web.Controllers
 
             await model.CalculatePlans(model.Year, projects, _projectService, _planService);
 
-            foreach(var proj in model.ProjectRowsDic.Values)
+            foreach (var proj in model.ProjectRowsDic.Values)
             {
                 if (proj.Balance != null)
                     proj.Balance.ClearZeroProperties();
@@ -77,7 +77,7 @@ namespace Cnf.Finance.Web.Controllers
         public async Task<IActionResult> Edit(int projectId, int year)
         {
             var project = await _projectService.FindProject(projectId);
-            if(project == null || project.ProjectId<=0 || year < 2019)
+            if (project == null || project.ProjectId <= 0 || year < 2019)
             {
                 return NotFound();
             }
@@ -86,9 +86,9 @@ namespace Cnf.Finance.Web.Controllers
             await projectYear.CalculatePlans(year, new Project[] { project }, _projectService, _planService);
 
             var model = projectYear.ProjectRowsDic[project.ProjectId];
-            for(var month = 1; month < 13; month++)
+            for (var month = 1; month < 13; month++)
             {
-                if(model.MonthDataDic[month] == null)
+                if (model.MonthDataDic[month] == null)
                 {
                     model.MonthDataDic[month] = new MonthDataViewModel
                     {
@@ -107,11 +107,11 @@ namespace Cnf.Finance.Web.Controllers
                 var existPlans = await _planService.GetYearPlansOfProject(model.Year, model.ProjectId);
 
                 // TODO:
-                foreach(var monthData in model.MonthDataDic.Values)
+                foreach (var monthData in model.MonthDataDic.Values)
                 {
                     var plan = (from p in existPlans
-                               where p.Month == monthData.Month
-                               select p).SingleOrDefault();
+                                where p.Month == monthData.Month
+                                select p).SingleOrDefault();
                     if (plan == null)
                     {
                         plan = new Plan
@@ -132,6 +132,79 @@ namespace Cnf.Finance.Web.Controllers
             }
 
             return View(model);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> Manage(int id)
+        {
+            var plan = await _planService.FindPlan(id);
+            var allPlans = await _planService.GetYearPlansOfProject(plan.Year, plan.ProjectId);
+            var prevMonth = plan.Month == 1 ? null : allPlans.Where(p => p.Month == plan.Month - 1).SingleOrDefault();
+            var nextMonth = plan.Month == 12 ? null : allPlans.Where(p => p.Month == plan.Month + 1).SingleOrDefault();
+
+            var model = (PlanManageViewModel)plan;
+            model.PreviousId = prevMonth?.Id;
+            model.NextId = nextMonth?.Id;
+
+            return View(model);
+        }
+
+        [AllowAnonymous]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveTask(PlanManageViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var task = new PlanTerms
+                {
+                    PlanId = model.PlanId,
+                    TermsId = model.SelectedTermsId.Value,
+                    Comments = model.TaskComments,
+                };
+                if (model.EditingTaskId.HasValue && model.EditingTaskId.Value > 0)
+                {
+                    task.Id = model.EditingTaskId.Value;
+                }
+                await _planService.SavePlanTerms(task);
+
+                return RedirectToAction(nameof(Manage), new { id = model.PlanId });
+            }
+
+            return StatusCode(500, ModelState);
+        }
+
+        [AllowAnonymous]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteTask(PlanManageViewModel model)
+        {
+            if(model.EditingTaskId == null)
+            {
+                return StatusCode(500, "没有发送要删除的任务Id");
+            }
+
+            await _planService.DeletePlanTerms(model.EditingTaskId.Value);
+
+            return RedirectToAction(nameof(Manage), new { id = model.PlanId });
+        }
+
+        [AllowAnonymous]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> SavePlan(PlanManageViewModel model)
+        {
+            var plan = new Plan
+            {
+                ProjectId = model.ProjectId,
+                Id = model.PlanId,
+                Year = model.Year,
+                Month = model.Month,
+                Incoming = model.Data.Incoming,
+                Settlement = model.Data.Settlement,
+                Retrieve = model.Data.Retievable,
+            };
+
+            await _planService.SavePlan(plan);
+
+            return RedirectToAction(nameof(Manage), new { id = model.PlanId });
         }
     }
 }

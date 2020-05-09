@@ -54,7 +54,9 @@
                             }
                             <td>
                                 @Html.HiddenFor(m => m.MonthDataDic[month].Month)
-                                @string.Format("{0:00}月", month)
+                                <a asp-action="Manage" asp-route-id="@Model.MonthDataDic[month].Id">
+                                    @string.Format("{0:00}月", month)
+                                </a>
                             </td>
                             <td>
                                 <input asp-for="@Model.MonthDataDic[month].Incoming" class="form-control form-control-sm" />

@@ -23,9 +23,13 @@ namespace Cnf.Finance.Api.Controllers
 
         // GET: api/PerformTerms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PerformTerms>>> GetPerformTerms()
+        public async Task<ActionResult<IEnumerable<PerformTerms>>> GetPerformTerms(int? performId)
         {
-            return await _context.PerformTerms.ToListAsync();
+            var query = from t in _context.PerformTerms
+                        where performId == null || performId.Value == t.PerformId
+                        select t;
+
+            return await query.ToListAsync();
         }
 
         // GET: api/PerformTerms/5

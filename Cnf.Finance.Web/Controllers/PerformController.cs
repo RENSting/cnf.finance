@@ -71,19 +71,40 @@ namespace Cnf.Finance.Web.Controllers
 
         public async Task<IActionResult> Edit(int projectId, int year, int month)
         {
-            var project = await _projectService.FindProject(projectId);
+            var project = await _projectService.RetriveProjectWithDetails(projectId, ProjectApiContent.RetrieveAll);
             if (project == null || project.ProjectId <= 0 || year < 2020 || month < 1 || month > 12)
             {
                 return NotFound();
             }
+
             //上一年结转
-            var balance = BalanceViewModel.Create((await _projectService.GetAnnualBalances(projectId, year - 1)).ToList());
+            var balance = BalanceViewModel.Create(project.AnnualBalance.Where(b => b.Year == year - 1));
+
             //当年全部计划
-            var plans = await _planService.GetYearPlansOfProject(year, projectId);
+            var plans = project.Plan.Where(p => p.Year == year);
+            var planId = plans.Where(p => p.Month == month).SingleOrDefault()?.Id;
             //当年全部月报
-            var performs = await _performService.GetYearPerformsOfProject(year, projectId);
+            var performs = project.Perform.Where(p => p.Year == year);
+            var performId = performs.Where(p => p.Month == month).SingleOrDefault()?.Id;
 
             var model = MonthPerformViewModel.Create(project, year, month, balance, plans, performs);
+
+            model.Terms = project.Terms.OrderBy(p => p.TermsCategory).ThenBy(p => p.TargetDate).Select(p => (TermsViewModel)p);
+
+            //当月全部计划任务
+            if (planId.HasValue)
+            {
+                model.PlanTerms = (await _planService.GetPlanTerms(planId.Value))
+                    .Select(p => TaskViewModel.Create(p, project.Terms.SingleOrDefault(t=>t.Id == p.TermsId)));
+            }
+
+            //当月全部完成任务
+            if(performId.HasValue)
+            {
+                model.PerformTerms = (await _performService.GetPerformTerms(performId.Value))
+                    .Select(p => TaskViewModel.Create(p, project.Terms.SingleOrDefault(t => t.Id == p.TermsId)));
+            }
+           
             model.ClearZeroProperties();
             
             return View(model);

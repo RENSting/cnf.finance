@@ -1,4 +1,5 @@
 ﻿using Cnf.Finance.Entity;
+using Cnf.Finance.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,9 @@ namespace Cnf.Finance.Web.Services
         {
             _apiConnector = apiConnector;
         }
+
+        public async Task<IEnumerable<PerformTerms>> GetPerformTerms(int performId) =>
+            await _apiConnector.HttpGetAsync<IEnumerable<PerformTerms>>(ROUTE_PERFORM, $"performId={performId}");
 
         public async Task<IEnumerable<Perform>> GetYearPerformsOfProject(int year, int projectId)
         {

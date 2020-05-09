@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Cnf.Finance.Entity;
+using Cnf.Finance.Web.Models;
 
 namespace Cnf.Finance.Web.Services
 {
@@ -14,5 +15,6 @@ namespace Cnf.Finance.Web.Services
         Task<IEnumerable<Perform>> GetYearPerformsOfProject(int year, int projectId);
 
         Task SavePerform(Perform perform);
+        Task<IEnumerable<PerformTerms>> GetPerformTerms(int performId);
     }
 }

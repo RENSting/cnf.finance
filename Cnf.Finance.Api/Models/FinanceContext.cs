@@ -121,7 +121,7 @@ namespace Cnf.Finance.Api.Models
 
                 entity.Property(e => e.TermsId).HasColumnName("TermsID");
 
-                entity.HasOne(d => d.Plain)
+                entity.HasOne(d => d.Plan)
                     .WithMany(p => p.PlanTerms)
                     .HasForeignKey(d => d.PlanId)
                     .HasConstraintName("FK_PlanTerms_Plan");

@@ -9,6 +9,10 @@ namespace Cnf.Finance.Web.Models
 {
     public class MonthPerformViewModel
     {
+        /// <summary>
+        /// 如果是新建完成月报，为空，否则大于0
+        /// </summary>
+        public int? PerformId { get; set; }
         public int ProjectId { get; set; }
 
         [Display(Name = "项目名称")]
@@ -75,21 +79,47 @@ namespace Cnf.Finance.Web.Models
 
         [Display(Name = "当月实际收入")]
         [DisplayFormat(DataFormatString = "{0:#.####}")]
-        [Required(ErrorMessage = "必须输入收入，如无请输入0")]
+        //[Required(ErrorMessage = "必须输入收入，如无请输入0")]
         [RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
         public decimal? Incoming { get; set; }
 
         [Display(Name = "当月实际结算")]
         [DisplayFormat(DataFormatString = "{0:#.####}")]
-        [Required(ErrorMessage = "必须输入结算，如无请输入0")]
+        //[Required(ErrorMessage = "必须输入结算，如无请输入0")]
         [RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
         public decimal? Settlement { get; set; }
 
         [Display(Name = "当月实际回款")]
         [DisplayFormat(DataFormatString = "{0:#.####}")]
-        [Required(ErrorMessage = "必须输入回款，如无请输入0")]
+        //[Required(ErrorMessage = "必须输入回款，如无请输入0")]
         [RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
         public decimal? Retrievable { get; set; }
+
+        /// <summary>
+        /// 弹出窗体正在编辑的完成情况条目的ID（即 PerformTermsId）
+        /// 如果==null或0，表示添加新的。否则就是编辑已有的。
+        /// </summary>
+        public int? EditingItemId { get; set; }
+
+        /// <summary>
+        /// 弹出窗体正在编辑的完成情况条目关联的合同条款（即某一项TermsId）
+        /// 不可为空
+        /// </summary>
+        [Required(ErrorMessage = "必须选择任务依据的合同条款")]
+        public int? SelectedTermsId { get; set; }
+
+        /// <summary>
+        /// 弹出窗体正在编辑的完成情况条目的摘要说明
+        /// </summary>
+        [Display(Name = "完成情况摘要")]
+        [Required(ErrorMessage = "必须输入完成情况摘要，如无需另写，可复制条款内容")]
+        public string EditingComments { get; set; }
+
+        public IEnumerable<TaskViewModel> PlanTerms { get; set; }
+
+        public IEnumerable<TaskViewModel> PerformTerms { get; set; }
+
+        public IEnumerable<TermsViewModel> Terms { get; set; }
 
         public static MonthPerformViewModel Create(Project project, int year, int month,
             BalanceViewModel balance, IEnumerable<Plan> plans, IEnumerable<Perform> performs)
@@ -130,6 +160,9 @@ namespace Cnf.Finance.Web.Models
                 TotalRetrievalbe = (from p in performs
                                     where p.Month < month
                                     select p.Retrieve).Sum(),
+                PerformId = (from p in performs
+                             where p.Month == month
+                             select p).SingleOrDefault()?.Id,
                 Incoming = (from p in performs
                             where p.Month == month
                             select p).SingleOrDefault()?.Incoming,

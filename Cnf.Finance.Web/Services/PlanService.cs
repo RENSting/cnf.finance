@@ -16,6 +16,8 @@ namespace Cnf.Finance.Web.Services
         const string ROUTE_PLAN = "api/Plans";
         const string FORMAT_QUERYSTRING_PLANS = "year={0}&projectIds={1}";
 
+        const string ROUTE_PLANTERMS = "api/PlanTerms";
+
         private readonly IApiConnector _apiConnector;
         public PlanService(IApiConnector apiConnector)
         {
@@ -43,5 +45,26 @@ namespace Cnf.Finance.Web.Services
                 await _apiConnector.HttpPostAsync<Plan, Plan>(
                     ROUTE_PLAN, plan);
         }
+
+        public async Task<Plan> FindPlan(int id) =>
+            await _apiConnector.HttpGetAsync<Plan>(ROUTE_PLAN + $"/{id}");
+
+        public async Task SavePlanTerms(PlanTerms task)
+        {
+            if (task.Id > 0)
+            {
+                await _apiConnector.HttpPutAsync<PlanTerms, IActionResult>(ROUTE_PLANTERMS + $"/{task.Id}", task);
+            }
+            else
+            {
+                await _apiConnector.HttpPostAsync<PlanTerms, PlanTerms>(ROUTE_PLANTERMS, task);
+            }
+        }
+
+        public async Task DeletePlanTerms(int planTermsId) =>
+            await _apiConnector.HttpDeleteAsync<PlanTerms>(ROUTE_PLANTERMS + $"/{planTermsId}");
+
+        public async Task<IEnumerable<PlanTerms>> GetPlanTerms(int planId) =>
+            await _apiConnector.HttpGetAsync<IEnumerable<PlanTerms>>(ROUTE_PLANTERMS, $"planId={planId}");
     }
 }

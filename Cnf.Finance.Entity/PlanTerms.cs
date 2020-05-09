@@ -10,7 +10,7 @@ namespace Cnf.Finance.Entity
         public int TermsId { get; set; }
         public string Comments { get; set; }
 
-        public virtual Plan Plain { get; set; }
+        public virtual Plan Plan { get; set; }
         public virtual Terms Terms { get; set; }
     }
 }

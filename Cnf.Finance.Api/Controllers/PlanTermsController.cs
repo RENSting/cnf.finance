@@ -23,9 +23,13 @@ namespace Cnf.Finance.Api.Controllers
 
         // GET: api/PlanTerms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlanTerms>>> GetPlanTerms()
+        public async Task<ActionResult<IEnumerable<PlanTerms>>> GetPlanTerms(int? planId)
         {
-            return await _context.PlanTerms.ToListAsync();
+            var query = from t in _context.PlanTerms
+                        where planId == null || planId.Value == t.PlanId
+                        select t;
+
+            return await query.ToListAsync();
         }
 
         // GET: api/PlanTerms/5
