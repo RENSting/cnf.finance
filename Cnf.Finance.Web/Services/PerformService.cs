@@ -17,6 +17,8 @@ namespace Cnf.Finance.Web.Services
         const string ROUTE_PERFORM = "api/Performs";
         const string FORMAT_QUERYSTRING_PERFORMS = "year={0}&projectIds={1}";
 
+        const string ROUTE_PERFORMTERMS = "api/PerformTerms";  // add query ?performId=
+
         private readonly IApiConnector _apiConnector;
         public PerformService(IApiConnector apiConnector)
         {
@@ -24,7 +26,7 @@ namespace Cnf.Finance.Web.Services
         }
 
         public async Task<IEnumerable<PerformTerms>> GetPerformTerms(int performId) =>
-            await _apiConnector.HttpGetAsync<IEnumerable<PerformTerms>>(ROUTE_PERFORM, $"performId={performId}");
+            await _apiConnector.HttpGetAsync<IEnumerable<PerformTerms>>(ROUTE_PERFORMTERMS, $"performId={performId}");
 
         public async Task<IEnumerable<Perform>> GetYearPerformsOfProject(int year, int projectId)
         {
