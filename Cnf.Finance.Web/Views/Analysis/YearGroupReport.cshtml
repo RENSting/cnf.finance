@@ -157,68 +157,68 @@
                     }
                 </td>
                 <!--上年结转-->
-                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format("{0:N}", record.AnnualBalance.Incoming))</span></td>
-                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format("{0:N}", record.AnnualBalance.Settlement))</span></td>
-                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format("{0:N}", record.AnnualBalance.Tax))</span></td>
-                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format("{0:N}", record.AnnualBalance.Retrievable))</span></td>
-                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format("{0:N}", lastStorage))</span></td>
-                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format("{0:N}", lastRecievable))</span></td>
+                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Incoming))</span></td>
+                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Settlement))</span></td>
+                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Tax))</span></td>
+                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Retrievable))</span></td>
+                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", lastStorage))</span></td>
+                <td rowspan="2" class="text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", lastRecievable))</span></td>
                 <!--本年度累加：计划-->
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Plan.Incoming))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Plan.Settlement))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Plan.Tax))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Plan.Retrievable))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", currentPlanStorage))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", currentPlanRecievable))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Plan.Incoming))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Plan.Settlement))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Plan.Tax))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Plan.Retrievable))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", currentPlanStorage))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", currentPlanRecievable))</span></td>
                 <!--当前余额：计划-->
                 <td class="text-primary text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Incoming.AddNullableDecimal(record.Accumulation.Plan.Incoming)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Incoming.AddNullableDecimal(record.Accumulation.Plan.Incoming)))</span>
                 </td>
                 <td class="text-primary text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Settlement.AddNullableDecimal(record.Accumulation.Plan.Settlement)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Settlement.AddNullableDecimal(record.Accumulation.Plan.Settlement)))</span>
                 </td>
                 <td class="text-primary text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Tax.AddNullableDecimal(record.Accumulation.Plan.Tax)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Tax.AddNullableDecimal(record.Accumulation.Plan.Tax)))</span>
                 </td>
                 <td class="text-primary text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Retrievable.AddNullableDecimal(record.Accumulation.Plan.Retrievable)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Retrievable.AddNullableDecimal(record.Accumulation.Plan.Retrievable)))</span>
                 </td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", planStorageBalance))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", planRecievableBalance))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", planStorageBalance))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", planRecievableBalance))</span></td>
                 <!--选择月份：计划-->
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Plan.Incoming))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Plan.Settlement))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Plan.Tax))</span></td>
-                <td class="text-primary text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Plan.Retrievable))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Plan.Incoming))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Plan.Settlement))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Plan.Tax))</span></td>
+                <td class="text-primary text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Plan.Retrievable))</span></td>
             </tr>
             <tr>
                 <!--本年累加：完成-->
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Perform.Incoming))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Perform.Settlement))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Perform.Tax))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.Accumulation.Perform.Retrievable))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", currentPerformStorage))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", currentPerformRecievable))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Perform.Incoming))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Perform.Settlement))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Perform.Tax))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.Accumulation.Perform.Retrievable))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", currentPerformStorage))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", currentPerformRecievable))</span></td>
                 <!--当前余额：完成-->
                 <td class="text-success text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Incoming.AddNullableDecimal(record.Accumulation.Perform.Incoming)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Incoming.AddNullableDecimal(record.Accumulation.Perform.Incoming)))</span>
                 </td>
                 <td class="text-success text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Settlement.AddNullableDecimal(record.Accumulation.Perform.Settlement)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Settlement.AddNullableDecimal(record.Accumulation.Perform.Settlement)))</span>
                 </td>
                 <td class="text-success text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Tax.AddNullableDecimal(record.Accumulation.Perform.Tax)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Tax.AddNullableDecimal(record.Accumulation.Perform.Tax)))</span>
                 </td>
                 <td class="text-success text-nowrap align-middle">
-                    <span>@(string.Format("{0:N}", record.AnnualBalance.Retrievable.AddNullableDecimal(record.Accumulation.Perform.Retrievable)))</span>
+                    <span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.AnnualBalance.Retrievable.AddNullableDecimal(record.Accumulation.Perform.Retrievable)))</span>
                 </td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", performStorageBalance))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", performRecievableBalance))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", performStorageBalance))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", performRecievableBalance))</span></td>
                 <!--选择月份：完成-->
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Perform.Incoming))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Perform.Settlement))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Perform.Tax))</span></td>
-                <td class="text-success text-nowrap align-middle"><span>@(string.Format("{0:N}", record.CurrentMonth.Perform.Retrievable))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Perform.Incoming))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Perform.Settlement))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Perform.Tax))</span></td>
+                <td class="text-success text-nowrap align-middle"><span>@(string.Format(new AccNumberFormatter(), "{0:N}", record.CurrentMonth.Perform.Retrievable))</span></td>
             </tr>
         }
         <tr class="bg-light">

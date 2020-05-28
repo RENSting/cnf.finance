@@ -93,12 +93,12 @@
         </tr>
         <tr>
             <td>@string.Format("{0:0000}年结转", Model.Year)</td>
-            <td colspan="2">@string.Format("{0:N}", lastIncoming)</td>
-            <td colspan="2">@string.Format("{0:N}", lastSettlement)</td>
-            <td colspan="2">@string.Format("{0:N}", lastTax)</td>
-            <td colspan="2">@string.Format("{0:N}", lastRetrieved)</td>
-            <td colspan="2">@string.Format("{0:N}", totalPlanStorage)</td>
-            <td colspan="2">@string.Format("{0:N}", totalPlanRecievable)</td>
+            <td colspan="2">@string.Format(new AccNumberFormatter(), "{0:N}", lastIncoming)</td>
+            <td colspan="2">@string.Format(new AccNumberFormatter(), "{0:N}", lastSettlement)</td>
+            <td colspan="2">@string.Format(new AccNumberFormatter(), "{0:N}", lastTax)</td>
+            <td colspan="2">@string.Format(new AccNumberFormatter(), "{0:N}", lastRetrieved)</td>
+            <td colspan="2">@string.Format(new AccNumberFormatter(), "{0:N}", totalPlanStorage)</td>
+            <td colspan="2">@string.Format(new AccNumberFormatter(), "{0:N}", totalPlanRecievable)</td>
         </tr>
         <tr>
             <td></td>
@@ -138,18 +138,18 @@
             totalPerformRecievable = totalPerformRecievable + performRecievable ?? 0M;
             <tr>
                 <td>@string.Format("{0:0000}年{1:00}月", Model.Year, m)</td>
-                <td class="text-primary">@string.Format("{0:N}", planIncoming)</td>
-                <td class="text-success">@string.Format("{0:N}", performIncoming)</td>
-                <td class="text-primary">@string.Format("{0:N}", planSettlement)</td>
-                <td class="text-success">@string.Format("{0:N}", performSettlement)</td>
-                <td class="text-primary">@string.Format("{0:N}", planTax)</td>
-                <td class="text-success">@string.Format("{0:N}", performTax)</td>
-                <td class="text-primary">@string.Format("{0:N}", planRetrived)</td>
-                <td class="text-success">@string.Format("{0:N}", performRetrived)</td>
-                <td class="text-primary">@string.Format("{0:N}", planStorage)</td>
-                <td class="text-success">@string.Format("{0:N}", performStorage)</td>
-                <td class="text-primary">@string.Format("{0:N}", planRecievable)</td>
-                <td class="text-success">@string.Format("{0:N}", performRecievable)</td>
+                <td class="text-primary">@string.Format(new AccNumberFormatter(), "{0:N}", planIncoming)</td>
+                <td class="text-success">@string.Format(new AccNumberFormatter(), "{0:N}", performIncoming)</td>
+                <td class="text-primary">@string.Format(new AccNumberFormatter(), "{0:N}", planSettlement)</td>
+                <td class="text-success">@string.Format(new AccNumberFormatter(), "{0:N}", performSettlement)</td>
+                <td class="text-primary">@string.Format(new AccNumberFormatter(), "{0:N}", planTax)</td>
+                <td class="text-success">@string.Format(new AccNumberFormatter(), "{0:N}", performTax)</td>
+                <td class="text-primary">@string.Format(new AccNumberFormatter(), "{0:N}", planRetrived)</td>
+                <td class="text-success">@string.Format(new AccNumberFormatter(), "{0:N}", performRetrived)</td>
+                <td class="text-primary">@string.Format(new AccNumberFormatter(), "{0:N}", planStorage)</td>
+                <td class="text-success">@string.Format(new AccNumberFormatter(), "{0:N}", performStorage)</td>
+                <td class="text-primary">@string.Format(new AccNumberFormatter(), "{0:N}", planRecievable)</td>
+                <td class="text-success">@string.Format(new AccNumberFormatter(), "{0:N}", performRecievable)</td>
             </tr>
         }
     <tr class="bg-light text-dark">
