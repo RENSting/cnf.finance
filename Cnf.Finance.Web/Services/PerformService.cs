@@ -25,6 +25,9 @@ namespace Cnf.Finance.Web.Services
             _apiConnector = apiConnector;
         }
 
+        public async Task DeletePerformTerms(int itemId) =>
+            await _apiConnector.HttpDeleteAsync<PerformTerms>(ROUTE_PERFORMTERMS + $"/{itemId}");
+
         public async Task<IEnumerable<PerformTerms>> GetPerformTerms(int performId) =>
             await _apiConnector.HttpGetAsync<IEnumerable<PerformTerms>>(ROUTE_PERFORMTERMS, $"performId={performId}");
 
@@ -50,5 +53,16 @@ namespace Cnf.Finance.Web.Services
                     ROUTE_PERFORM, perform);
         }
 
+        public async Task SavePerformTerms(PerformTerms item)
+        {
+            if (item.Id > 0)
+            {
+                await _apiConnector.HttpPutAsync<PerformTerms, IActionResult>(ROUTE_PERFORMTERMS + $"/{item.Id}", item);
+            }
+            else
+            {
+                await _apiConnector.HttpPostAsync<PerformTerms, PerformTerms>(ROUTE_PERFORMTERMS, item);
+            }
+        }
     }
 }

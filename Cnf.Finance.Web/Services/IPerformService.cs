@@ -16,5 +16,9 @@ namespace Cnf.Finance.Web.Services
 
         Task SavePerform(Perform perform);
         Task<IEnumerable<PerformTerms>> GetPerformTerms(int performId);
+
+        Task SavePerformTerms(PerformTerms item);
+
+        Task DeletePerformTerms(int itemId);
     }
 }

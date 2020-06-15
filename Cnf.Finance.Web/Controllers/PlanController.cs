@@ -123,7 +123,7 @@ namespace Cnf.Finance.Web.Controllers
                     }
                     plan.Incoming = monthData.Incoming;
                     plan.Settlement = monthData.Settlement;
-                    plan.Retrieve = monthData.Retievable;
+                    plan.Retrieve = monthData.Retrievable;
 
                     await _planService.SavePlan(plan);
                 }
@@ -199,7 +199,7 @@ namespace Cnf.Finance.Web.Controllers
                 Month = model.Month,
                 Incoming = model.Data.Incoming,
                 Settlement = model.Data.Settlement,
-                Retrieve = model.Data.Retievable,
+                Retrieve = model.Data.Retrievable,
             };
 
             await _planService.SavePlan(plan);

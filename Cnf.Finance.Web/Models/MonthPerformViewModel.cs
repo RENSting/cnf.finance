@@ -65,35 +65,40 @@ namespace Cnf.Finance.Web.Models
         [DisplayFormat(DataFormatString = "{0:#.####}")]
         public decimal? TotalRetrievalbe { get; set; }
 
-        [Display(Name = "当月计划收入")]
-        [DisplayFormat(DataFormatString = "{0:#.####}")]
-        public decimal? PlanIncoming { get; set; }
+        //[Display(Name = "当月计划收入")]
+        //[DisplayFormat(DataFormatString = "{0:#.####}")]
+        //public decimal? PlanIncoming { get; set; }
 
-        [Display(Name = "当月计划结算")]
-        [DisplayFormat(DataFormatString = "{0:#.####}")]
-        public decimal? PlanSettlement { get; set; }
+        //[Display(Name = "当月计划结算")]
+        //[DisplayFormat(DataFormatString = "{0:#.####}")]
+        //public decimal? PlanSettlement { get; set; }
 
-        [Display(Name = "当月计划回款")]
-        [DisplayFormat(DataFormatString = "{0:#.####}")]
-        public decimal? PlanRetrievalbe { get; set; }
+        //[Display(Name = "当月计划回款")]
+        //[DisplayFormat(DataFormatString = "{0:#.####}")]
+        //public decimal? PlanRetrievalbe { get; set; }
 
-        [Display(Name = "当月实际收入")]
-        [DisplayFormat(DataFormatString = "{0:#.####}")]
-        //[Required(ErrorMessage = "必须输入收入，如无请输入0")]
-        [RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
-        public decimal? Incoming { get; set; }
+        public MonthDataViewModel PlanData { get; set; }
 
-        [Display(Name = "当月实际结算")]
-        [DisplayFormat(DataFormatString = "{0:#.####}")]
-        //[Required(ErrorMessage = "必须输入结算，如无请输入0")]
-        [RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
-        public decimal? Settlement { get; set; }
+        //[Display(Name = "当月实际收入")]
+        //[DisplayFormat(DataFormatString = "{0:#.####}")]
+        //[Required(ErrorMessage = "必输项，如无请输入0")]
+        //[RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
+        //public decimal? Incoming { get; set; }
 
-        [Display(Name = "当月实际回款")]
-        [DisplayFormat(DataFormatString = "{0:#.####}")]
-        //[Required(ErrorMessage = "必须输入回款，如无请输入0")]
-        [RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
-        public decimal? Retrievable { get; set; }
+        //[Display(Name = "当月实际结算")]
+        //[DisplayFormat(DataFormatString = "{0:#.####}")]
+        //[Required(ErrorMessage = "必输项，如无请输入0")]
+        //[RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
+        //public decimal? Settlement { get; set; }
+
+        //[Display(Name = "当月实际回款")]
+        //[DisplayFormat(DataFormatString = "{0:#.####}")]
+        //[Required(ErrorMessage = "必输项，如无请输入0")]
+        //[RegularExpression(@"^(\-|\+)?\d+(\.\d+)?$", ErrorMessage = "必须输入数字")]
+        //public decimal? Retrievable { get; set; }
+
+        public MonthDataViewModel PerformData { get; set; }
+
 
         /// <summary>
         /// 弹出窗体正在编辑的完成情况条目的ID（即 PerformTermsId）
@@ -135,14 +140,7 @@ namespace Cnf.Finance.Web.Models
                 IncomingBalance = balance?.Incoming,
                 SettlementBalance = balance?.Settlement,
                 RetrievableBalance = balance?.Retrievable,
-                PlanIncoming = (from p in plans where p.Month == month
-                                select p).SingleOrDefault()?.Incoming,
-                PlanSettlement = (from p in plans
-                                  where p.Month == month
-                                  select p).SingleOrDefault()?.Settlement,
-                PlanRetrievalbe = (from p in plans
-                                   where p.Month == month
-                                   select p).SingleOrDefault()?.Retrieve,
+                PlanData = (from p in plans where p.Month == month select p).SingleOrDefault(),
                 TotalPlanIncoming = (from p in plans where p.Month < month
                                      select p.Incoming).Sum(),
                 TotalPlanSettlement = (from p in plans
@@ -163,15 +161,7 @@ namespace Cnf.Finance.Web.Models
                 PerformId = (from p in performs
                              where p.Month == month
                              select p).SingleOrDefault()?.Id,
-                Incoming = (from p in performs
-                            where p.Month == month
-                            select p).SingleOrDefault()?.Incoming,
-                Settlement = (from p in performs
-                              where p.Month == month
-                              select p).SingleOrDefault()?.Settlement,
-                Retrievable = (from p in performs
-                              where p.Month == month
-                              select p).SingleOrDefault()?.Retrieve,
+                PerformData = (from p in performs where p.Month==month select p).SingleOrDefault(),
             };
 
             return model;
