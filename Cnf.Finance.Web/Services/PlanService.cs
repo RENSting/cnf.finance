@@ -18,6 +18,11 @@ namespace Cnf.Finance.Web.Services
 
         const string ROUTE_PLANTERMS = "api/PlanTerms";
 
+        // GET: api/PlanTerms/GetTasks?orgId=1&year=2020&month=2
+        // 注意： 返回一个PlanTerms类型的数组，其中，每个元素的Plan, Terms, Terms.Project是有效的对象。
+        const string ROUTE_ORGTASKS_PERIOD = "api/PlanTerms/GetTasks";
+        const string FORMAT_QUERYSTRING_ORGTASKS_PERIOD = "orgId={0}&year={1}&month={2}";
+
         private readonly IApiConnector _apiConnector;
         public PlanService(IApiConnector apiConnector)
         {
@@ -66,5 +71,9 @@ namespace Cnf.Finance.Web.Services
 
         public async Task<IEnumerable<PlanTerms>> GetPlanTerms(int planId) =>
             await _apiConnector.HttpGetAsync<IEnumerable<PlanTerms>>(ROUTE_PLANTERMS, $"planId={planId}");
+
+        public async Task<IEnumerable<PlanTerms>> GetMonthlyTasksOfOrg(int orgId, int year, int month) =>
+            await _apiConnector.HttpGetAsync<IEnumerable<PlanTerms>>(ROUTE_ORGTASKS_PERIOD,
+                string.Format(FORMAT_QUERYSTRING_ORGTASKS_PERIOD, orgId, year, month));
     }
 }

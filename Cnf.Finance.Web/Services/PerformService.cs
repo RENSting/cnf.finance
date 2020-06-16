@@ -19,6 +19,11 @@ namespace Cnf.Finance.Web.Services
 
         const string ROUTE_PERFORMTERMS = "api/PerformTerms";  // add query ?performId=
 
+        // GET: api/PerformTerms/GetTasks?orgId=1&year=2020&month=2
+        // 注意： 返回一个PerformTerms类型的数组，其中，每个元素的Perform, Terms, Terms.Project是有效的对象。
+        const string ROUTE_ORGTASKS_PERIOD = "api/PerformTerms/GetTasks";
+        const string FORMAT_QUERYSTRING_ORGTASKS_PERIOD = "orgId={0}&year={1}&month={2}";
+
         private readonly IApiConnector _apiConnector;
         public PerformService(IApiConnector apiConnector)
         {
@@ -64,5 +69,8 @@ namespace Cnf.Finance.Web.Services
                 await _apiConnector.HttpPostAsync<PerformTerms, PerformTerms>(ROUTE_PERFORMTERMS, item);
             }
         }
+        public async Task<IEnumerable<PerformTerms>> GetMonthlyTasksOfOrg(int orgId, int year, int month) =>
+            await _apiConnector.HttpGetAsync<IEnumerable<PerformTerms>>(ROUTE_ORGTASKS_PERIOD,
+                string.Format(FORMAT_QUERYSTRING_ORGTASKS_PERIOD, orgId, year, month));
     }
 }

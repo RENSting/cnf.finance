@@ -18,5 +18,7 @@ namespace Cnf.Finance.Web.Services
         Task DeletePlanTerms(int value);
 
         Task<IEnumerable<PlanTerms>> GetPlanTerms(int planId);
+
+        Task<IEnumerable<PlanTerms>> GetMonthlyTasksOfOrg(int orgId, int year, int month);
     }
 }

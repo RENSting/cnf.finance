@@ -20,5 +20,7 @@ namespace Cnf.Finance.Web.Services
         Task SavePerformTerms(PerformTerms item);
 
         Task DeletePerformTerms(int itemId);
+
+        Task<IEnumerable<PerformTerms>> GetMonthlyTasksOfOrg(int orgId, int year, int month);
     }
 }

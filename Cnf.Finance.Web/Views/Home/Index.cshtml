@@ -1,8 +1,133 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model TaskIndexViewModel
+
+@{
+    ViewData["Title"] = "首页";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="card">
+    <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" asp-action="Index">任务</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Dashboard">看板</a>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body p-2">
+        <form method="get" class="form-inline mb-2">
+            <label asp-for="OrganizationId" class="mr-2"></label>
+            <select asp-for="OrganizationId" asp-items="ViewBag.OrgList" class="form-control form-control-sm mr-2">
+
+            </select>
+            <label asp-for="Year" class="mr-2"></label>
+            <select asp-for="Year" class="form-control form-control-sm mr-2">
+                @for(var i=2019; i<2030; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </select>
+            <label asp-for="Month" class="mr-2"></label>
+            <select asp-for="Month" class="form-control form-control-sm mr-2">
+                @for(var i=1; i <= 12; i++)
+                {
+                    <option value="@i">@string.Format("{0:00}月", i)</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">筛选</button>
+        </form>
+        <div class="card-deck">
+            <div class="card">
+                <div class="card-header">
+                    计划进行
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PlanTasks.Count() == 0)
+                    {
+                        <div class="alert alert-secondary text-warning">
+                            当月无计划任务
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card p-0 m-0 border-0">
+                            <ul class="list-group list-group-flush">
+                                @foreach(var t in Model.PlanTasks.OrderBy(m=>m.ProjectName)){
+                                <li class="list-group-item p-2">
+                                    @{ 
+                                        var projectClass = t.ProjectStatus == ProjectStatus.Stopped ?
+                                                "alert-warning" : "alert-secondary";
+                                        if (t.ProjectHasProblem)
+                                            projectClass = "alert-danger";
+                                    }
+                                    <div class="alert @(projectClass) p-2 mb-2">
+                                        <h6>@Html.DisplayFor(m => t.ProjectName)（单位：万元）</h6>
+                                        <span class="text-dark small">
+                                            @Html.DisplayFor(m=>t.TermsCategory)：
+                                            @Html.DisplayFor(m => t.TermsContent)
+                                        </span>
+                                        <br />
+                                        <div class="d-flex d-inline-flex d-sm-inline-flex small">
+                                            <div class="mr-2">计划收入：@Html.DisplayFor(m => t.Incoming)</div>
+                                            <div class="mr-2">计划结算：@Html.DisplayFor(m => t.Settlement)</div>
+                                            <div>计划回款：@Html.DisplayFor(m => t.Retrieved)</div>
+                                        </div>
+                                    </div>
+                                    <p class="m-0 text-sm-left">@Html.DisplayFor(m => t.TaskContent)</p>
+                                </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    实际发生
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.PerformTasks.Count() == 0)
+                    {
+                        <div class="alert alert-secondary text-warning">
+                            当月未登记发生的结算和回款行动
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card p-0 m-0 border-0">
+                            <ul class="list-group list-group-flush">
+                                @foreach (var t in Model.PerformTasks.OrderBy(m => m.ProjectName))
+                                {
+                                    <li class="list-group-item p-2">
+                                        @{
+                                            var projectClass = t.ProjectStatus == ProjectStatus.Stopped ?
+                                                    "alert-warning" : "alert-secondary";
+                                            if (t.ProjectHasProblem)
+                                                projectClass = "alert-danger";
+                                        }
+                                        <div class="alert @(projectClass) p-2 mb-2">
+                                            <h6>@Html.DisplayFor(m => t.ProjectName)（单位：万元）</h6>
+                                            <span class="text-dark small">
+                                                @Html.DisplayFor(m => t.TermsCategory)：
+                                                @Html.DisplayFor(m => t.TermsContent)
+                                            </span>
+                                            <br />
+                                            <div class="d-flex d-inline-flex d-sm-inline-flex small">
+                                                <div class="mr-2">完成收入：@Html.DisplayFor(m => t.Incoming)</div>
+                                                <div class="mr-2">完成结算：@Html.DisplayFor(m => t.Settlement)</div>
+                                                <div>完成回款：@Html.DisplayFor(m => t.Retrieved)</div>
+                                            </div>
+                                        </div>
+                                        <p class="m-0 text-sm-left">@Html.DisplayFor(m => t.TaskContent)</p>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
