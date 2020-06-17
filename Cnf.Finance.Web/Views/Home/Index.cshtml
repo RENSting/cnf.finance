@@ -16,7 +16,7 @@
         </ul>
     </div>
     <div class="card-body p-2">
-        <form method="get" class="form-inline mb-2">
+        <form method="get" class="form-inline mb-2 ml-2 small">
             <label asp-for="OrganizationId" class="mr-2"></label>
             <select asp-for="OrganizationId" asp-items="ViewBag.OrgList" class="form-control form-control-sm mr-2">
 
@@ -51,34 +51,46 @@
                     }
                     else
                     {
-                        <div class="card p-0 m-0 border-0">
-                            <ul class="list-group list-group-flush">
-                                @foreach(var t in Model.PlanTasks.OrderBy(m=>m.ProjectName)){
-                                <li class="list-group-item p-2">
-                                    @{ 
-                                        var projectClass = t.ProjectStatus == ProjectStatus.Stopped ?
-                                                "alert-warning" : "alert-secondary";
-                                        if (t.ProjectHasProblem)
-                                            projectClass = "alert-danger";
-                                    }
-                                    <div class="alert @(projectClass) p-2 mb-2">
-                                        <h6>@Html.DisplayFor(m => t.ProjectName)（单位：万元）</h6>
+                        @:<div class="card p-0 m-0 border-0">
+                            @:<ul class="list-group list-group-flush">
+                                var currentPlanProjectName = string.Empty;
+                                foreach (var t in Model.PlanTasks.OrderBy(m => m.ProjectName))
+                                {
+                                    if (!t.ProjectName.Equals(currentPlanProjectName))
+                                    {
+                                        if (!string.IsNullOrEmpty(currentPlanProjectName))
+                                        {
+                                            @: </li>
+                                        }
+                                        currentPlanProjectName = t.ProjectName;
+                                        @: <li class="list-group-item p-2">
+                                            var projectClass = t.ProjectStatus == ProjectStatus.Stopped ? "alert-warning" : "alert-secondary";
+                                            if (t.ProjectHasProblem)
+                                            {
+                                                projectClass = "alert-danger";
+                                            }
+                                            <div class="alert @(projectClass) p-2 mb-2">
+                                                <h6>@(currentPlanProjectName)（单位：万元）</h6>
+                                                <div class="d-flex d-inline-flex d-sm-inline-flex small">
+                                                    <div class="mr-2">计划收入：@Html.DisplayFor(m => t.Incoming)</div>
+                                                    <div class="mr-2">计划结算：@Html.DisplayFor(m => t.Settlement)</div>
+                                                    <div>计划回款：@Html.DisplayFor(m => t.Retrieved)</div>
+                                                </div>
+                                            </div>
+                                        }
                                         <span class="text-dark small">
-                                            @Html.DisplayFor(m=>t.TermsCategory)：
+                                            @Html.DisplayFor(m => t.TermsCategory)：
                                             @Html.DisplayFor(m => t.TermsContent)
                                         </span>
                                         <br />
-                                        <div class="d-flex d-inline-flex d-sm-inline-flex small">
-                                            <div class="mr-2">计划收入：@Html.DisplayFor(m => t.Incoming)</div>
-                                            <div class="mr-2">计划结算：@Html.DisplayFor(m => t.Settlement)</div>
-                                            <div>计划回款：@Html.DisplayFor(m => t.Retrieved)</div>
-                                        </div>
-                                    </div>
-                                    <p class="m-0 text-sm-left">@Html.DisplayFor(m => t.TaskContent)</p>
-                                </li>
-                                }
-                            </ul>
-                        </div>
+                                        <p class="m-0 text-info small">
+                                            计划任务：@Html.DisplayFor(m => t.TaskContent)
+                                        </p>
+                                        <hr class="my-1" />
+                                    }
+                                @: </li>
+                            @:</ul>
+                        @:</div>
                     }
 
                 </div>
@@ -96,35 +108,45 @@
                     }
                     else
                     {
-                        <div class="card p-0 m-0 border-0">
-                            <ul class="list-group list-group-flush">
-                                @foreach (var t in Model.PerformTasks.OrderBy(m => m.ProjectName))
+                        @:<div class="card p-0 m-0 border-0">
+                            @:<ul class="list-group list-group-flush">
+                                var currentPerformProjectName = string.Empty;
+                                foreach (var t in Model.PerformTasks.OrderBy(m => m.ProjectName))
                                 {
-                                    <li class="list-group-item p-2">
-                                        @{
-                                            var projectClass = t.ProjectStatus == ProjectStatus.Stopped ?
-                                                    "alert-warning" : "alert-secondary";
-                                            if (t.ProjectHasProblem)
-                                                projectClass = "alert-danger";
+                                    if (!t.ProjectName.Equals(currentPerformProjectName))
+                                    {
+                                        if (!string.IsNullOrEmpty(currentPerformProjectName))
+                                        {
+                                            @: </li>
+                                        }
+                                        currentPerformProjectName = t.ProjectName;
+                                        @: <li class="list-group-item p-2">
+                                        var projectClass = t.ProjectStatus == ProjectStatus.Stopped ? "alert-warning" : "alert-secondary";
+                                        if (t.ProjectHasProblem)
+                                        {
+                                            projectClass = "alert-danger";
                                         }
                                         <div class="alert @(projectClass) p-2 mb-2">
-                                            <h6>@Html.DisplayFor(m => t.ProjectName)（单位：万元）</h6>
-                                            <span class="text-dark small">
-                                                @Html.DisplayFor(m => t.TermsCategory)：
-                                                @Html.DisplayFor(m => t.TermsContent)
-                                            </span>
-                                            <br />
+                                            <h6>@(currentPerformProjectName)（单位：万元）</h6>
                                             <div class="d-flex d-inline-flex d-sm-inline-flex small">
                                                 <div class="mr-2">完成收入：@Html.DisplayFor(m => t.Incoming)</div>
                                                 <div class="mr-2">完成结算：@Html.DisplayFor(m => t.Settlement)</div>
                                                 <div>完成回款：@Html.DisplayFor(m => t.Retrieved)</div>
                                             </div>
                                         </div>
-                                        <p class="m-0 text-sm-left">@Html.DisplayFor(m => t.TaskContent)</p>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                                    }
+                                    <span class="text-dark small">
+                                        @Html.DisplayFor(m => t.TermsCategory)：
+                                        @Html.DisplayFor(m => t.TermsContent)
+                                    </span>
+                                    <br />
+                                    <p class="m-0 text-primary small">
+                                        完成情况：@Html.DisplayFor(m => t.TaskContent)</p>
+                                    <hr class="my-1" />
+                                 }
+                                @: </li>
+                            @:</ul>
+                        @:</div>
                     }
                 </div>
             </div>
