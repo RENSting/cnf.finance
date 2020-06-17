@@ -23,9 +23,13 @@ namespace Cnf.Finance.Api.Controllers
 
         // GET: api/PlanTerms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PlanTerms>>> GetPlanTerms()
+        public async Task<ActionResult<IEnumerable<PlanTerms>>> GetPlanTerms(int? planId)
         {
-            return await _context.PlanTerms.ToListAsync();
+            var query = from t in _context.PlanTerms
+                        where planId == null || planId.Value == t.PlanId
+                        select t;
+
+            return await query.ToListAsync();
         }
 
         // GET: api/PlanTerms/5
@@ -37,6 +41,38 @@ namespace Cnf.Finance.Api.Controllers
             if (planTerms == null)
             {
                 return NotFound();
+            }
+
+            return planTerms;
+        }
+
+        // GET: api/PlanTerms/GetTasks?orgId=1&year=2020&month=2
+        // 注意： 返回一个PlanTerms类型的数组，其中，每个元素的Plan, Terms, Terms.Project是有效的对象。
+        [HttpGet("GetTasks")]
+        public async Task<ActionResult<IEnumerable<PlanTerms>>> GetPlanTerms(int orgId, int year, int month)
+        {
+            var planTermsQuery = from t in _context.PlanTerms
+                                                .Include(t => t.Plan)
+                                                .Include(t => t.Terms)
+                                                    .ThenInclude(t => t.Project)
+                                 where t.Terms.Project.OrganizationId == orgId
+                                     && t.Plan.Year == year
+                                     && t.Plan.Month == month
+                                 select t;
+
+            var planTerms = await planTermsQuery.ToListAsync();
+
+            foreach (var t in planTerms)
+            {
+                t.Plan.PlanTerms = null;
+                t.Plan.Project = null;
+                t.Terms.PerformTerms = null;
+                t.Terms.PlanTerms = null;
+                t.Terms.Project.Plan = null;
+                t.Terms.Project.AnnualBalance = null;
+                t.Terms.Project.Organization = null;
+                t.Terms.Project.Perform = null;
+                t.Terms.Project.Terms = null;
             }
 
             return planTerms;

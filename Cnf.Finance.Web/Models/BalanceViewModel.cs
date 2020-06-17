@@ -48,14 +48,15 @@ namespace Cnf.Finance.Web.Models
         /// </summary>
         /// <param name="projectYearBalances"></param>
         /// <returns></returns>
-        public static BalanceViewModel Create(List<AnnualBalance> projectYearBalances)
+        public static BalanceViewModel Create(IEnumerable<AnnualBalance> projectYearBalances)
         {
-            if (projectYearBalances.Count == 0)
+            if (projectYearBalances == null || projectYearBalances.Count() == 0)
                 return null;
+
             var model = new BalanceViewModel
             {
-                ProjectId = projectYearBalances[0].ProjectId,
-                Year = projectYearBalances[0].Year
+                ProjectId = projectYearBalances.FirstOrDefault().ProjectId,
+                Year = projectYearBalances.FirstOrDefault().Year
             };
             var incoming = projectYearBalances.FirstOrDefault(b => b.BalanceCategory == (int)BalanceCategory.Incoming);
             if (incoming != null)

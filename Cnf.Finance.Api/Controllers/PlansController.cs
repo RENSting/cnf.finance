@@ -42,11 +42,28 @@ namespace Cnf.Finance.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Plan>> GetPlan(int id)
         {
-            var plan = await _context.Plan.FindAsync(id);
+            var query = _context.Plan
+                            .Include(p => p.Project).ThenInclude(p => p.Terms)
+                            .Include(p => p.PlanTerms);
 
+            var plan = await query.SingleOrDefaultAsync(p => p.Id == id);
+           
             if (plan == null)
             {
                 return NotFound();
+            }
+
+            //清除循环引用
+            plan.Project.Plan = null;
+            foreach (var term in plan.Project.Terms)
+            {
+                term.Project = null;
+                term.PlanTerms = null;
+            }
+            foreach (var pt in plan.PlanTerms)
+            {
+                pt.Plan = null;
+                pt.Terms = null;
             }
 
             return plan;

@@ -23,9 +23,13 @@ namespace Cnf.Finance.Api.Controllers
 
         // GET: api/PerformTerms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PerformTerms>>> GetPerformTerms()
+        public async Task<ActionResult<IEnumerable<PerformTerms>>> GetPerformTerms(int? performId)
         {
-            return await _context.PerformTerms.ToListAsync();
+            var query = from t in _context.PerformTerms
+                        where performId == null || performId.Value == t.PerformId
+                        select t;
+
+            return await query.ToListAsync();
         }
 
         // GET: api/PerformTerms/5
@@ -41,6 +45,39 @@ namespace Cnf.Finance.Api.Controllers
 
             return performTerms;
         }
+
+        // GET: api/PerformTerms/GetTasks?orgId=1&year=2020&month=2
+        // 注意： 返回一个PerformTerms类型的数组，其中，每个元素的Perform, Terms, Terms.Project是有效的对象。
+        [HttpGet("GetTasks")]
+        public async Task<ActionResult<IEnumerable<PerformTerms>>> GetPerformTerms(int orgId, int year, int month)
+        {
+            var performTermsQuery = from t in _context.PerformTerms
+                                                .Include(t => t.Perform)
+                                                .Include(t => t.Terms)
+                                                    .ThenInclude(t => t.Project)
+                                 where t.Terms.Project.OrganizationId == orgId
+                                     && t.Perform.Year == year
+                                     && t.Perform.Month == month
+                                 select t;
+
+            var performTerms = await performTermsQuery.ToListAsync();
+
+            foreach (var t in performTerms)
+            {
+                t.Perform.PerformTerms = null;
+                t.Perform.Project = null;
+                t.Terms.PerformTerms = null;
+                t.Terms.PlanTerms = null;
+                t.Terms.Project.Plan = null;
+                t.Terms.Project.AnnualBalance = null;
+                t.Terms.Project.Organization = null;
+                t.Terms.Project.Perform = null;
+                t.Terms.Project.Terms = null;
+            }
+
+            return performTerms;
+        }
+
 
         // PUT: api/PerformTerms/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for

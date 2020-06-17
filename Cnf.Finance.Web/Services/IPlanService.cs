@@ -13,5 +13,12 @@ namespace Cnf.Finance.Web.Services
         Task<IEnumerable<Plan>> GetYearPlansOfProject(int year, int projectId);
 
         Task SavePlan(Plan plan);
+        Task<Plan> FindPlan(int id);
+        Task SavePlanTerms(PlanTerms task);
+        Task DeletePlanTerms(int value);
+
+        Task<IEnumerable<PlanTerms>> GetPlanTerms(int planId);
+
+        Task<IEnumerable<PlanTerms>> GetMonthlyTasksOfOrg(int orgId, int year, int month);
     }
 }

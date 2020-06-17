@@ -4,8 +4,11 @@ using Cnf.Finance.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Cnf.Finance.Web.Controllers
 {
@@ -14,11 +17,16 @@ namespace Cnf.Finance.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ISystemService _systemService;
+        private readonly IPlanService _planService;
+        private readonly IPerformService _performService;
 
-        public HomeController(ILogger<HomeController> logger, ISystemService systemService)
+        public HomeController(ILogger<HomeController> logger, ISystemService systemService,
+                        IPlanService planService, IPerformService performService)
         {
             _logger = logger;
             _systemService = systemService;
+            _planService = planService;
+            _performService = performService;
         }
 
         [AllowAnonymous]
@@ -103,7 +111,45 @@ namespace Cnf.Finance.Web.Controllers
         }
 
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(TaskIndexViewModel model)
+        {
+            if(model == null)
+            {
+                model = new TaskIndexViewModel();
+            }
+
+            if (model.Year <= 0)
+                model.Year = DateTime.Today.Year;
+            if (model.Month <= 0)
+                model.Month = DateTime.Today.Month;
+
+            var allowAllOrgs = Helper.AllowAllOrgs(HttpContext, out int? allowedOrgId);
+            var orgnizations = allowAllOrgs ? await _systemService.GetOrganizations() :
+                                new Organization[] { await _systemService.FindOrganization(allowedOrgId.Value) };
+
+            if (!allowAllOrgs)
+                model.OrganizationId = allowedOrgId.Value;
+            else
+            {
+                if (model.OrganizationId <= 0)
+                    model.OrganizationId = orgnizations.FirstOrDefault().OrganizationId;
+            }
+
+            ViewBag.OrgList = new SelectList(orgnizations,
+                nameof(Organization.OrganizationId), nameof(Organization.Name));
+
+            var planTerms = await _planService.GetMonthlyTasksOfOrg(model.OrganizationId, model.Year, model.Month);
+
+            model.BindPlanTasks(planTerms);
+
+            var performTerms = await _performService.GetMonthlyTasksOfOrg(model.OrganizationId, model.Year, model.Month);
+
+            model.BindPerformTasks(performTerms);
+
+            return View(model);
+        }
+
+        public IActionResult Dashboard()
         {
             return View();
         }

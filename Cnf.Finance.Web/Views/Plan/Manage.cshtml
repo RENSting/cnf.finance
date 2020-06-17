@@ -1,0 +1,283 @@
+﻿@model PlanManageViewModel
+
+@{
+    ViewData["Title"] = "计划任务";
+}
+
+<h4 class="text-center">根据合同条款制订计划任务</h4>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row m-0 p-0">
+            <div class="col-1">
+                @if (Model.PreviousId == null)
+                {
+                    <span class="text-muted text-nowrap float-left">上个月</span>
+                }
+                else
+                {
+                    <a asp-action="Manage" asp-route-id="@Model.PreviousId.Value" class="float-left text-nowrap">上个月</a>
+                }
+            </div>
+            <div class="col-10 text-center">
+                <h5 class="card-title m-0">@string.Format("{0:0000}年度{1:00}月", Model.Year, Model.Month)</h5>
+            </div>
+            <div class="col-1">
+                @if (Model.NextId == null)
+                {
+                    <span class="text-muted text-nowrap float-right">下个月</span>
+                }
+                else
+                {
+                    <a asp-action="Manage" asp-route-id="@Model.NextId.Value" class="float-right text-nowrap">下个月</a>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div>
+            <!--项目基本信息-->
+            <table class="table table-sm table-bordered small">
+                <tr>
+                    <td class="text-nowrap">项目名称</td>
+                    <td colspan="3">@Model.ProjectName</td>
+                </tr>
+                <tr>
+                    <td class="text-nowrap">预计总收入</td>
+                    <td>@string.Format("{0:#.####}万元", Model.ContractAmount)</td>
+                    <td class="text-nowrap text-right">项目经理</td>
+                    <td>@Model.ProjectManager</td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <!--当月准备实现的两金相关数据-->
+            <div class="card">
+                <div class="card-header bg-info text-white p-2">
+                    本月计划完成的两金相关数据
+                </div>
+                <div class="card-body px-3 pt-2 pb-0">
+                    <form method="post">
+                        @Html.HiddenFor(m => m.PlanId)
+                        @Html.HiddenFor(m => m.Month)
+                        @Html.HiddenFor(m => m.Year)
+                        @Html.HiddenFor(m => m.ProjectId)
+                        <div asp-validation-summary="ModelOnly" class="text-danger small"></div>
+                        <div class="form-row">
+                            <div class="form-group col">
+                                <label asp-for="Data.Incoming"></label>
+                                <input asp-for="Data.Incoming" class="form-control form-control-sm" />
+                                <span asp-validation-for="Data.Incoming" class="text-danger small"></span>
+                            </div>
+                            <div class="form-group col">
+                                <label asp-for="Data.Settlement"></label>
+                                <input asp-for="Data.Settlement" class="form-control form-control-sm" />
+                                <span asp-validation-for="Data.Settlement" class="text-danger small"></span>
+                            </div>
+                            <div class="form-group col">
+                                <label asp-for="Data.Retrievable"></label>
+                                <input asp-for="Data.Retrievable" class="form-control form-control-sm" />
+                                <span asp-validation-for="Data.Retrievable" class="text-danger small"></span>
+                            </div>
+                        </div>
+                        <div class="form-group mt-2">
+                            <button asp-action="SavePlan" class="btn btn-sm btn-primary">保存月计划数据</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="mt-2">
+            <!--已经定义的任务-->
+            <div class="card">
+                <div class="card-header bg-info text-white p-2">
+                    合同条款依据及任务
+                </div>
+                <div class="card-body p-0">
+                    @if (Model.Tasks.Count() == 0)
+                    {
+                        <div class="alert alert-secondary p-2">
+                            本月没有添加任何依据及需要执行的任务，请单击添加任务按钮进行添加
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="list-group list-group-flush small">
+                            @foreach (var t in Model.Tasks)
+                            {
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>条款内容： @t.Provision</span>
+                                        <span class="badge badge-primary badge-pill">@Html.DisplayFor(m => t.TermsCategory)</span>
+                                    </div>
+                                    <div>
+                                        <span>条款触发日期：</span>
+                                        <span class="mr-4">@Html.DisplayFor(m => t.TargetDate)</span>
+                                        <span>条款涉及金额：</span>
+                                        <span>@(Html.DisplayFor(m => t.TargetAmount))(万元)</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            任务摘要：<span>@Html.DisplayFor(m => t.Comments)</span>
+                                        </div>
+                                        <button class="btn btn-sm btn-link p-0" type="button" onclick="if (editTask(this) == false) {
+                                                alert('无法编辑此任务');
+                                                return false;
+                                                }"
+                                                data-task-id="@t.Id" data-terms-id="@t.TermsId">
+                                            修改任务
+                                        </button>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    <div class="form-group ml-3 mt-2">
+                        <button class="btn btn-sm btn-primary" type="button"
+                                onclick="if (createNewTask() == false) {
+                            alert('此合同没有录入任何条款可供使用。');
+                            return false;
+                        }">
+                            添加新任务
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a asp-action="Index">返回计划管理</a>
+    </div>
+</div>
+
+<!-- Model Edit Tasks -->
+<form method="post">
+    <div class="modal fade" id="dlgEditTask" data-backdrop="static" tabindex="-1" role="dialog"
+         aria-labelledby="编辑任务" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editingTaskTitle">任务</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.HiddenFor(m => m.PlanId)
+                    @Html.HiddenFor(m => m.EditingTaskId, new { data_editing_taskid = "true" })
+                    @Html.HiddenFor(m => m.SelectedTermsId, new { data_editing_selectedtermsid = "true" })
+                    <div class="text-muted small">
+                        请选择一条合同中对应的条款，然后输入解释说明，点击保存
+                    </div>
+                    <span id="selectedTermsIdValidator" class="text-danger small">必须从下表中选择一项任务所依据的合同条款</span>
+                    <table class="table table-sm table-bordered table-hover small">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th></th>
+                                <th>类型</th>
+                                <th>触发日期</th>
+                                <th>金额(万)</th>
+                                <th>合同条款</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var t in Model.Terms)
+                            {
+                                <tr title="@t.Remarks" onclick="clickTermsRow(this);">
+                                    <td>
+                                        <input type="radio" name="editingtermsid" onclick="clickTermsRadio(this);"
+                                               data-editing-termsid="@t.TermsId" />
+                                    </td>
+                                    <td>@Html.DisplayFor(m => t.Category)</td>
+                                    <td>@Html.DisplayFor(m => t.OnDate)</td>
+                                    <td>@Html.DisplayFor(m => t.Amount)</td>
+                                    <td>@Html.DisplayFor(m => t.Provision)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="form-group">
+                        <label asp-for="TaskComments"></label>
+                        <textarea asp-for="TaskComments" class="form-control form-control-sm"
+                                  data-editing-task="true" rows="3" placeholder="请输入依据或任务的解释说明"></textarea>
+                        <span asp-validation-for="TaskComments" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button asp-action="SaveTask" class="btn btn-primary"
+                            onclick="if (checkSelectedTerms() == false) return false;">
+                        保存任务
+                    </button>
+                    <button asp-action="DeleteTask" class="btn btn-danger" data-editing-delete="true"
+                            onclick="if (confirm('删除任务不可恢复，确实要删除吗?') == false) return false;">
+                        删除
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script type="text/javascript">
+        function createNewTask() {
+            var termsCount = @Model.Terms.Count().ToString();
+            if (termsCount == '0')
+                return false;
+
+            $("#selectedTermsIdValidator").hide();
+            $("#editingTaskTitle").text("添加新任务");
+            $("input[data-editing-taskid='true']").val('');
+            $("input[data-editing-selectedtermsid='true']").val('');
+            $("input[name='editingtermsid']").prop("checked", false);
+            $("textarea[data-editing-task='true']").val('');
+            $("button[data-editing-delete='true']").hide();
+            $("#dlgEditTask").modal('show');
+            return true;
+        }
+
+        function editTask(btn) {
+            var termsCount = @Model.Terms.Count().ToString();
+            if (termsCount == '0')
+                return false;
+            var id = $(btn).data("task-id");
+            var termsId = $(btn).data("terms-id");
+            var comments = $(btn).parent("div").find("span").text();
+            $("#selectedTermsIdValidator").hide();
+            $("#editingTaskTitle").text("修改任务");
+            $("input[data-editing-taskid='true']").val(id);
+            $("input[data-editing-selectedtermsid='true']").val(termsId);
+            $("input[name='editingtermsid'][data-editing-termsid='" + termsId + "']").prop("checked", true);
+            $("textarea[data-editing-task='true']").val(comments);
+            $("button[data-editing-delete='true']").show();
+            $("#dlgEditTask").modal('show');
+            return true;
+        }
+
+        function clickTermsRow(tr) {
+            var radio = $(tr).find("input[type='radio']");
+            $("input[name='editingtermsid']").prop("checked", false);
+            radio.prop("checked", true);
+            clickTermsRadio(radio[0]);
+        }
+
+        function clickTermsRadio(radio) {
+            $("input[data-editing-selectedtermsid='true']").val($(radio).data("editing-termsid"));
+        }
+
+        function checkSelectedTerms() {
+            var selectedTermsId = $("input[data-editing-selectedtermsid='true']").val();
+            if (selectedTermsId == undefined || selectedTermsId == null || selectedTermsId == '') {
+                $("#selectedTermsIdValidator").show();
+                return false;
+            }
+            else {
+                $("#selectedTermsIdValidator").hide();
+                return true;
+            }
+        }
+    </script>
+}

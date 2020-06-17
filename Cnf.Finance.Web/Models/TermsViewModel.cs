@@ -16,6 +16,7 @@ namespace Cnf.Finance.Web.Models
         [Display(Name ="综合条款")]
         Others
     }
+
     public class TermsViewModel
     {
         public int TermsId { get; set; }

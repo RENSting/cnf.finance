@@ -54,7 +54,9 @@
                             }
                             <td>
                                 @Html.HiddenFor(m => m.MonthDataDic[month].Month)
-                                @string.Format("{0:00}月", month)
+                                <a asp-action="Manage" asp-route-id="@Model.MonthDataDic[month].Id">
+                                    @string.Format("{0:00}月", month)
+                                </a>
                             </td>
                             <td>
                                 <input asp-for="@Model.MonthDataDic[month].Incoming" class="form-control form-control-sm" />
@@ -65,8 +67,8 @@
                                 <span asp-validation-for="@Model.MonthDataDic[month].Settlement" class="text-danger small"></span>
                             </td>
                             <td>
-                                <input asp-for="@Model.MonthDataDic[month].Retievable" class="form-control form-control-sm" />
-                                <span asp-validation-for="@Model.MonthDataDic[month].Retievable" class="text-danger small"></span>
+                                <input asp-for="@Model.MonthDataDic[month].Retrievable" class="form-control form-control-sm" />
+                                <span asp-validation-for="@Model.MonthDataDic[month].Retrievable" class="text-danger small"></span>
                             </td>
                         </tr>
                     }

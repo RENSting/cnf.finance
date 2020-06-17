@@ -86,6 +86,26 @@ namespace Cnf.Finance.Web
 
             context.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, properties);
         }
+
+        internal static string GetModelError(Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary modelState)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            //获取每一个key对应的ModelStateDictionary
+            foreach (var key in modelState.Keys)
+            {
+                if (modelState[key].ValidationState == Microsoft.AspNetCore.Mvc.ModelBinding.ModelValidationState.Invalid)
+                {
+                    sb.Append(key);
+                    sb.Append(":");
+                    foreach (var err in modelState[key].Errors)
+                    {
+                        sb.Append(err);
+                        sb.Append(";");
+                    }
+                }
+            }
+            return sb.ToString();
+        }
     }
 
     public static class Extension
