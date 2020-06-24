@@ -39,12 +39,44 @@ namespace Cnf.Finance.Api.Controllers
             return await query.ToListAsync();
         }
 
+        // GET: api/Projects/SearchProject
+        //  query string : ?orgId=&searchName=&activeOnly=&pageIndex=&pageSize=
+        //      orgId       :   Organization filter
+        //      searchName  :   Project Name filter
+        //      activeOnly  :   bool
+        //      pageIndex   :   int based=0
+        //      pageSize    :   int default=10
+        [HttpGet("SearchProject")]
+        public async Task<ActionResult<SearchResult<Project>>> GetProject(int? orgId = default, string searchName = default, bool? activeOnly = default
+                                                                    , int pageIndex = 0, int pageSize = 10)
+        {
+            activeOnly = activeOnly == null ? true : activeOnly.Value;
+            var query = from p in _context.Project
+                        where (orgId == null || orgId.Value <= 0 || p.OrganizationId == orgId.Value)
+                            && (string.IsNullOrWhiteSpace(searchName) || p.Name.Contains(searchName))
+                            && (activeOnly.Value == false || p.ActiveStatus == true)
+                        select p;
+
+            SearchResult<Project> result = new SearchResult<Project>();
+            result.Total = await query.CountAsync();
+            if(result.Total == 0)
+            {
+                result.Records = new List<Project>();
+            }
+            else
+            {
+                result.Records = await query.Skip(pageSize * pageIndex).Take(pageSize).ToListAsync();
+            }
+            return result;
+        }
+
+
         // GET: api/Projects/5?content=null|0|1|2|3 
         // Querystring Parameters:
         //      content =   null|0      : base only;
         //                  1           : has balance and terms
         //                  2           : has plans and performs
-        //                  3           : has all
+        //                  3           : has all（performterms and planterms are all in terms）
         [HttpGet("{id}")]
         public async Task<ActionResult<Project>> GetProject(int id, int? content)
         {
@@ -60,6 +92,9 @@ namespace Cnf.Finance.Api.Controllers
                     _ => await _context.Project
                             .Include(p => p.AnnualBalance)
                             .Include(p => p.Terms)
+                                .ThenInclude(t=>t.PlanTerms)
+                            .Include(p=>p.Terms)
+                                .ThenInclude(t=>t.PerformTerms)
                             .Include(p => p.Plan)
                             .Include(p => p.Perform).Where(p => p.ProjectId == id).SingleOrDefaultAsync()   //contains all
                 };
@@ -74,13 +109,31 @@ namespace Cnf.Finance.Api.Controllers
                 b.Project = null;
 
             foreach (var t in project.Terms)
+            {
                 t.Project = null;
+                foreach(var pt in t.PlanTerms)
+                {
+                    pt.Plan = null;
+                    pt.Terms = null;
+                }
+                foreach(var pt in t.PerformTerms)
+                {
+                    pt.Perform = null;
+                    pt.Terms = null;
+                }
+            }
 
             foreach (var p in project.Plan)
+            {
                 p.Project = null;
+                p.PlanTerms = null;
+            }
 
             foreach (var p in project.Perform)
+            {
                 p.Project = null;
+                p.PerformTerms = null;
+            }
 
             return project;
         }

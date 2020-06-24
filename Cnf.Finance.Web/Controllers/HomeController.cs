@@ -19,14 +19,16 @@ namespace Cnf.Finance.Web.Controllers
         private readonly ISystemService _systemService;
         private readonly IPlanService _planService;
         private readonly IPerformService _performService;
+        private readonly IProjectService _projectService;
 
         public HomeController(ILogger<HomeController> logger, ISystemService systemService,
-                        IPlanService planService, IPerformService performService)
+                        IPlanService planService, IPerformService performService, IProjectService projectService)
         {
             _logger = logger;
             _systemService = systemService;
             _planService = planService;
             _performService = performService;
+            _projectService = projectService;
         }
 
         [AllowAnonymous]
@@ -113,7 +115,7 @@ namespace Cnf.Finance.Web.Controllers
 
         public async Task<IActionResult> Index(TaskIndexViewModel model)
         {
-            if(model == null)
+            if (model == null)
             {
                 model = new TaskIndexViewModel();
             }
@@ -147,6 +149,45 @@ namespace Cnf.Finance.Web.Controllers
             model.BindPerformTasks(performTerms);
 
             return View(model);
+        }
+
+        public async Task<JsonResult> GetProjectData(int projectId)
+        {
+            var project = await _projectService.RetriveProjectWithDetails(projectId, ProjectApiContent.RetrieveAll);
+            return Json(project);
+        }
+
+        public async Task<IActionResult> Terms(ProjectListViewModel model)
+        {
+            var allowAllOrgs = Helper.AllowAllOrgs(HttpContext, out int? allowedOrgId);
+            if (!allowAllOrgs)
+                model.SelectedOrgId = allowedOrgId;
+            if (model.PageSize <= 0)
+                model.PageSize = 3;
+
+            var orgnizations = allowAllOrgs ? await _systemService.GetOrganizations() :
+                                new Organization[] { await _systemService.FindOrganization(allowedOrgId.Value) };
+
+            SearchResult<Project> searchResult = await _projectService.SearchProjects(
+                        model.SelectedOrgId, model.SearchName, !model.IncludeInActive, model.PageIndex, model.PageSize);
+
+            model.Pages = searchResult.Total == 0 ? 1
+                                  : ( searchResult.Total % model.PageSize == 0 ? searchResult.Total / model.PageSize
+                                                        : searchResult.Total / model.PageSize + 1
+                                    );
+
+            model.Projects = searchResult.Records.Select(p => ProjectViewModel.Create(p, orgnizations));
+
+            ViewBag.AllowAllOrgs = allowAllOrgs;
+            ViewBag.OrgList = new SelectList(orgnizations,
+                nameof(Organization.OrganizationId), nameof(Organization.Name));
+
+            return View(model);
+        }
+
+        public IActionResult Help()
+        {
+            return View();
         }
 
         public IActionResult Dashboard()

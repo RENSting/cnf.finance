@@ -12,8 +12,8 @@
         <a class="ml-4" asp-action="Edit">添加新项目</a>
     </p>
 </div>
-<div class="mb-2">
-    <form method="post" asp-antiforgery="true" class="form-inline small">
+<form method="post" asp-antiforgery="true" id="form">
+    <div class="mb-2 form-inline small">
         <div class="form-group mr-2">
             <label asp-for="SelectedOrgId" class="control-label mr-2"></label>
             <select asp-for="SelectedOrgId" asp-items="@ViewBag.OrgList" class="form-control form-control-sm">
@@ -33,128 +33,172 @@
             </label>
         </div>
         <div class="form-group">
-            <input type="submit" value="筛选" class="btn btn-sm btn-primary" />
+            <input type="submit" value="筛选" onclick="setPageIndex(0);" class="btn btn-sm btn-primary" />
         </div>
-    </form>
-</div>
-
-@if (Model.Projects == null || Model.Projects.Count() == 0)
-{
-    <div class="alert alert-secondary">
-        系统中暂时还没有任何满足条件的项目，请添加新项目或修改筛选条件试试。
     </div>
-}
-else
-{
-    <table class="table table-sm table-bordered small">
-        <thead class="text-nowrap">
-            <tr>
-                <th rowspan="2">
-                    ID
-                </th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().Name)
-                </th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ContractCode)
-                </th>
-                <th colspan="2">预计总收入和毛利</th>
-                <th rowspan="2">税率</th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ProjectManager)
-                </th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().OrganizationId)
-                </th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().StartDate)
-                </th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().EndDate)
-                </th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ProjectStatus)
-                </th>
-                <th rowspan="2">
-                    涉诉
-                </th>
-                <th rowspan="2">
-                    跟踪
-                </th>
-                <th rowspan="2">
-                    @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().CloseDate)
-                </th>
-                <th rowspan="2"></th>
-            </tr>
-            <tr>
-                <th>
-                    （万元）
-                </th>
-                <th>（%）</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Projects)
-            {
-                <tr @if (item.HasProblem) { @: class="table-danger"
-                    }>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ProjectId)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ContractCode)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modelItem => item.ContractAmount)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modelItem => item.EstimatingProfit)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modeItem => item.TaxRate)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modelItem => item.ProjectManager)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(m => item.OrganizationName)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modelItem => item.StartDate)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modelItem => item.EndDate)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modelItem => item.ProjectStatus)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.HasProblem)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ActiveStatus)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.DisplayFor(modelItem => item.CloseDate)
-                    </td>
-                    <td class="text-nowrap">
-                        @Html.ActionLink("修改", "Edit", new { id = item.ProjectId }) |
-                        @Html.ActionLink("管理", "Manage", new { id = item.ProjectId })
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
 
-}
+    @if (Model.Projects == null || Model.Projects.Count() == 0)
+    {
+        <div class="alert alert-secondary">
+            系统中暂时还没有任何满足条件的项目，请添加新项目或修改筛选条件试试。
+        </div>
+    }
+    else
+    {
+        <table class="table table-sm table-bordered small">
+            <thead class="text-nowrap">
+                <tr>
+                    <th rowspan="2">
+                        ID
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().Name)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ContractCode)
+                    </th>
+                    <th colspan="2">预计总收入和毛利</th>
+                    <th rowspan="2">税率</th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ProjectManager)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().OrganizationId)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().StartDate)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().EndDate)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().ProjectStatus)
+                    </th>
+                    <th rowspan="2">
+                        涉诉
+                    </th>
+                    <th rowspan="2">
+                        跟踪
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(model => model.Projects.FirstOrDefault().CloseDate)
+                    </th>
+                    <th rowspan="2"></th>
+                </tr>
+                <tr>
+                    <th>
+                        （万元）
+                    </th>
+                    <th>（%）</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Projects)
+                {
+                    <tr @if (item.HasProblem) { @: class="table-danger"
+                        }>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ProjectId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContractCode)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.ContractAmount)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.EstimatingProfit)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modeItem => item.TaxRate)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.ProjectManager)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.OrganizationName)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.StartDate)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.EndDate)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.ProjectStatus)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.HasProblem)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ActiveStatus)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.DisplayFor(modelItem => item.CloseDate)
+                        </td>
+                        <td class="text-nowrap">
+                            @Html.ActionLink("修改", "Edit", new { id = item.ProjectId }) |
+                            @Html.ActionLink("管理", "Manage", new { id = item.ProjectId })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="form-inline mt-2">
+            @Html.HiddenFor(m => m.PageIndex, new { data_field = "PageIndex" })
+            <div class="form-group mr-2">
+                <label asp-for="PageSize" class="col-form-label col-form-label-sm mr-2"></label>
+                <select class="form-control form-control-sm" asp-for="PageSize" onchange="setPageIndex(0); document.getElementById('form').submit();">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item">
+                            <button class="page-link" onclick="setPageIndex(0);" type="submit">&laquo;</button>
+                        </li>
+                        @for (int i = 0; i < Model.Pages; i++)
+                        {
+                            string css;
+                            if (i == Model.PageIndex)
+                            {
+                                css = "page-item active";
+                            }
+                            else
+                            {
+                                css = "page-item";
+                            }
+                            <li class="@(css)">
+                                <button class="page-link" onclick="setPageIndex(@i);" type="submit">@(i+1)</button>
+                            </li>
+                        }
+                        <li class="page-item">
+                            <button class="page-link" onclick="setPageIndex(@(Model.Pages-1));" type="submit">&raquo;</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    }
+</form>
 
 @section Scripts{
     <script type="text/javascript">
         $(function () {
             $("div.container").attr("class", "container-fluid");
         })
+
+        function setPageIndex(i) {
+            $("input[data-field='PageIndex']").val(i);
+        }
     </script>
 }

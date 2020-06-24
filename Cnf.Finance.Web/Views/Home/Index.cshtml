@@ -6,9 +6,13 @@
 
 <div class="card">
     <div class="card-header">
+        <a class="float-right btn btn-sm btn-link m-0 p-0" asp-action="Help">如何使用?</a>
         <ul class="nav nav-tabs card-header-tabs">
             <li class="nav-item">
                 <a class="nav-link active" asp-action="Index">任务</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Terms">条款</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" asp-action="Dashboard">看板</a>
@@ -38,11 +42,11 @@
             <button type="submit" class="btn btn-sm btn-primary">筛选</button>
         </form>
         <div class="card-deck">
-            <div class="card">
-                <div class="card-header">
+            <div class="card bg-info">
+                <div class="card-header text-center p-1 text-white">
                     计划进行
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-1">
                     @if (Model.PlanTasks.Count() == 0)
                     {
                         <div class="alert alert-secondary text-warning">
@@ -69,12 +73,13 @@
                                             {
                                                 projectClass = "alert-danger";
                                             }
-                                            <div class="alert @(projectClass) p-2 mb-2">
-                                                <h6>@(currentPlanProjectName)（单位：万元）</h6>
+                                            <div class="alert @(projectClass) p-2 mb-2 small">
+                                                <strong class="mr-2">@(currentPlanProjectName)</strong>
                                                 <div class="d-flex d-inline-flex d-sm-inline-flex small">
-                                                    <div class="mr-2">计划收入：@Html.DisplayFor(m => t.Incoming)</div>
-                                                    <div class="mr-2">计划结算：@Html.DisplayFor(m => t.Settlement)</div>
-                                                    <div>计划回款：@Html.DisplayFor(m => t.Retrieved)</div>
+                                                    <div class="mr-2">计划（万元）</div>
+                                                    <div class="mr-2">收入=@Html.DisplayFor(m => t.Incoming)</div>
+                                                    <div class="mr-2">结算=@Html.DisplayFor(m => t.Settlement)</div>
+                                                    <div>回款=@Html.DisplayFor(m => t.Retrieved)</div>
                                                 </div>
                                             </div>
                                         }
@@ -95,11 +100,11 @@
 
                 </div>
             </div>
-            <div class="card">
-                <div class="card-header">
+            <div class="card bg-success">
+                <div class="card-header text-center p-1 text-white">
                     实际发生
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-1">
                     @if (Model.PerformTasks.Count() == 0)
                     {
                         <div class="alert alert-secondary text-warning">
@@ -126,12 +131,13 @@
                                         {
                                             projectClass = "alert-danger";
                                         }
-                                        <div class="alert @(projectClass) p-2 mb-2">
-                                            <h6>@(currentPerformProjectName)（单位：万元）</h6>
+                                        <div class="alert @(projectClass) p-2 mb-2 small">
+                                            <strong class="mr-2">@(currentPerformProjectName)</strong>
                                             <div class="d-flex d-inline-flex d-sm-inline-flex small">
-                                                <div class="mr-2">完成收入：@Html.DisplayFor(m => t.Incoming)</div>
-                                                <div class="mr-2">完成结算：@Html.DisplayFor(m => t.Settlement)</div>
-                                                <div>完成回款：@Html.DisplayFor(m => t.Retrieved)</div>
+                                                <div class="mr-2">完成（万元）</div>
+                                                <div class="mr-2">收入=@Html.DisplayFor(m => t.Incoming)</div>
+                                                <div class="mr-2">结算=@Html.DisplayFor(m => t.Settlement)</div>
+                                                <div>回款=@Html.DisplayFor(m => t.Retrieved)</div>
                                             </div>
                                         </div>
                                     }

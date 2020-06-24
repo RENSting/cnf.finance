@@ -1,0 +1,281 @@
+﻿@model ProjectListViewModel
+
+@{
+    ViewData["Title"] = "条款";
+}
+
+<form method="post" asp-antiforgery="true" id="form">
+    <div class="card">
+        <div class="card-header">
+            <a class="float-right btn btn-sm btn-link m-0 p-0" asp-action="Help">如何使用?</a>
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="Index">任务</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" asp-action="Terms">条款</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="Dashboard">看板</a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body p-2">
+            <div class="form-inline small">
+                <div class="form-group mr-2">
+                    <label asp-for="SelectedOrgId" class="control-label mr-2"></label>
+                    <select asp-for="SelectedOrgId" asp-items="@ViewBag.OrgList" class="form-control form-control-sm">
+                        @if (ViewBag.AllowAllOrgs)
+                        {
+                            <option value="">-=全部=-</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group mr-2">
+                    <label asp-for="SearchName" class="control-label mr-2"></label>
+                    <input asp-for="SearchName" placeholder="模糊查询..." class="form-control form-control-sm" />
+                </div>
+                <div class="form-group form-check mr-2">
+                    <label class="form-check-label">
+                        <input class="form-check-input" asp-for="IncludeInActive" /> @Html.DisplayNameFor(model => model.IncludeInActive)
+                    </label>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="筛选" onclick="setPageIndex(0);" class="btn btn-sm btn-primary" />
+                </div>
+            </div>
+            @if (Model.Projects.Count() == 0)
+            {
+                <div class="alert alert-warning">
+                    该单位没有需要监控的工程项目
+                </div>
+            }
+            else
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var p in Model.Projects)
+                    {
+                        var projectClass = p.Status == (int)ProjectStatus.Stopped ? "list-group-item-warning" : "list-group-item-success";
+                        if (p.HasProblem)
+                        {
+                            projectClass = "list-group-item-danger";
+                        }
+                        <li class="list-group-item p-1 @(projectClass) border-0">
+                            <div class="card">
+                                <div class="card-header p-2">
+                                    <h6 class="m-0">
+                                        <span>@p.ShortName</span>
+                                        <span class="small">
+                                            @string.Format("预计总收入：{0:N}万元，预计毛利率：{1:#.#}%，项目经理：{2}",
+                                                    p.ContractAmount, p.EstimatingProfit, p.ProjectManager)
+                                        </span>
+                                        <span class="badge badge-pill badge-dark float-right">@p.ProjectStatus</span>
+                                        @if (p.HasProblem)
+                                        {
+                                            <span class="badge badge-pill badge-danger float-right mx-2">涉诉</span>
+                                        }
+                                    </h6>
+                                </div>
+                                <div class="card-body py-0" data-category="project" data-project-id="@p.ProjectId">
+                                    <div class="spinner-border text-dark" role="status">
+                                        <span class="sr-only">正在加载...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+
+                <div class="form-inline mt-2">
+                    @Html.HiddenFor(m => m.PageIndex, new { data_field = "PageIndex" })
+                    <div class="form-group mr-2">
+                        <label asp-for="PageSize" class="col-form-label col-form-label-sm mr-2"></label>
+                        <select class="form-control form-control-sm" asp-for="PageSize" onchange="setPageIndex(0); document.getElementById('form').submit();">
+                            <option value="3">3</option>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item">
+                                    <button class="page-link" onclick="setPageIndex(0);" type="submit">&laquo;</button>
+                                </li>
+                                @for (int i = 0; i < Model.Pages; i++)
+                                {
+                                    string css;
+                                    if (i == Model.PageIndex)
+                                    {
+                                        css = "page-item active";
+                                    }
+                                    else
+                                    {
+                                        css = "page-item";
+                                    }
+                                    <li class="@(css)">
+                                        <button class="page-link" onclick="setPageIndex(@i);" type="submit">@(i+1)</button>
+                                    </li>
+                                }
+                                <li class="page-item">
+                                    <button class="page-link" onclick="setPageIndex(@(Model.Pages-1));" type="submit">&raquo;</button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script type="text/javascript">
+        var HtmlUtil = {
+            /*1.用浏览器内部转换器实现html转码*/
+            htmlEncode: function (html) {
+                //1.首先动态创建一个容器标签元素，如DIV
+                var temp = document.createElement("div");
+                //2.然后将要转换的字符串设置为这个元素的innerText(ie支持)或者textContent(火狐，google支持)
+                (temp.textContent != undefined) ? (temp.textContent = html) : (temp.innerText = html);
+                //3.最后返回这个元素的innerHTML，即得到经过HTML编码转换的字符串了
+                var output = temp.innerHTML;
+                temp = null;
+                return output;
+            },
+
+            /*2.用浏览器内部转换器实现html解码*/
+            htmlDecode: function (text) {
+                //1.首先动态创建一个容器标签元素，如DIV
+                var temp = document.createElement("div");
+                //2.然后将要转换的字符串设置为这个元素的innerHTML(ie，火狐，google都支持)
+                temp.innerHTML = text;
+                //3.最后返回这个元素的innerText(ie支持)或者textContent(火狐，google支持)，即得到经过HTML解码的字符串了。
+                var output = temp.innerText || temp.textContent;
+                temp = null;
+                return output;
+            },
+
+            /*3. 格式化数字
+             * * 参数说明：
+             * * number：要格式化的数字
+             * * decimals：保留几位小数
+             * * dec_point：小数点符号
+             * * thousands_sep：千分位符号
+             * */
+            formatNumber: function (number, decimals, dec_point, thousands_sep) {
+                number = (number + '').replace(/[^0-9+-Ee.]/g, '');
+                var n = !isFinite(+number) ? 0 : +number,
+                    prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+                    sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+                    dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+                    s = '',
+                    toFixedFix = function (n, prec) {
+                        var k = Math.pow(10, prec);
+                        return '' + Math.ceil(n * k) / k;
+                    };
+                s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+                var re = /(-?\d+)(\d{3})/;
+                while (re.test(s[0])) {
+                    s[0] = s[0].replace(re, "$1" + sep + "$2");
+                }
+                if ((s[1] || '').length < prec) {
+                    s[1] = s[1] || '';
+                    s[1] += new Array(prec - s[1].length + 1).join('0');
+                }
+                return s.join(dec);
+            },
+
+            fortmatDate: function (date) {
+                var d = new Date(date.toString());
+                return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+            }
+        };
+
+        function setPageIndex(i) {
+            $("input[data-field='PageIndex']").val(i);
+        }
+
+        function getTaskParent(planOrPerforms, id) {
+            for (i = 0; i < planOrPerforms.length; i++) {
+                if (planOrPerforms[i].id == id) {
+                    return planOrPerforms[i];
+                }
+            }
+            return null;
+        }
+
+        function getTermsCategory(category) {
+            return category == 0 ? '结算条款' : category == 1 ? '收款条件' : '综合条款';
+        }
+
+        $(function () {
+            var rowOpen = '<div class="row border-bottom">';
+            var rowClose = '</div>'
+            var colOpen = '<div class="col-4 p-1">';
+            var colClose = '</div>';
+            $("div[data-category='project']").each(function () {
+                var projectDiv = this;
+                var projectId = $(this).data("project-id");
+                var termRowsHtml = '';
+                $.getJSON("/Home/GetProjectData?projectId=" + projectId, function (project) {
+                    if (project.terms.length == 0) {
+                        termRowsHtml = rowOpen + '<span class="small m-2">项目没有登记任何结算和收款条件</span>' + rowClose;
+                    }
+                    else {
+                        for (var i = 0; i < project.terms.length; i++) {
+                            var term = project.terms[i];
+                            //1. 创建 条款 列
+                            var provSpan = '<span class="small">' + getTermsCategory(term.termsCategory) + "：" + HtmlUtil.htmlEncode(term.provision) + '</span>';
+                            var dateSpan = '<br/><span class="small">触发日期：' + HtmlUtil.fortmatDate(term.targetDate) + '</span>';
+                            var amountSpan = '<br/><span class="small">涉及金额：' + term.targetAmount + '万</span>';
+                            var termColHtml = colOpen + provSpan + dateSpan + amountSpan + colClose;
+                            //2. 创建 计划 列
+                            var s = '';
+                            for (var j = 0; j < term.planTerms.length; j++) {
+                                s += '<div class="row small">';
+                                var task = term.planTerms[j];
+                                s += '<div class="col-2 text-nowrap">';
+                                var plan = getTaskParent(project.plan, task.planId);
+                                if (plan != null) {
+                                    var prompt = '计划：收入=' + plan.incoming + '万，结算=' + plan.settlement + '万，回款=' + plan.retrieve + '万';
+                                    s += '<span title="' + prompt + '">' + plan.year + '/' + plan.month + '</span>';
+                                }
+                                s += '</div>';
+                                s += '<div class="col-10">';
+                                s += task.comments;
+                                s += '</div>';
+                                s += '</div>';
+                            }
+                            var plansColHtml = colOpen + s + colClose;
+                            //3. 创建 完成 列
+                            s = '';
+                            for (var j = 0; j < term.performTerms.length; j++) {
+                                s += '<div class="row small">';
+                                var task = term.performTerms[j];
+                                s += '<div class="col-2 text-nowrap">';
+                                var perform = getTaskParent(project.perform, task.performId);
+                                if (perform != null) {
+                                    var prompt = '完成：收入=' + perform.incoming + '万，结算=' + perform.settlement + '万，回款=' + perform.retrieve + '万';
+                                    s += '<span title="' + prompt + '">' + perform.year + '/' + perform.month + '</span>';
+                                }
+                                s += '</div>';
+                                s += '<div class="col-10">';
+                                s += task.comments;
+                                s += '</div>';
+                                s += '</div>';
+                            }
+                            var performsColHtml = colOpen + s + colClose;
+
+                            //此条款行
+                            termRowsHtml += (rowOpen + termColHtml + plansColHtml + performsColHtml + rowClose);
+                        }
+                    }
+                    $(projectDiv).html(termRowsHtml);
+                });
+            });
+        })
+    </script>
+}

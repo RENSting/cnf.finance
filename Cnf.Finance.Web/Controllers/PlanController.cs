@@ -45,7 +45,7 @@ namespace Cnf.Finance.Web.Controllers
                 model.SelectedOrgId = allowedOrgId;
 
             //TODO: 帅选满足条件的项目
-            var projects = await _projectService.SearchProjects(model.SelectedOrgId, model.SearchName, !model.IncludeInActive);
+            var projects = await _projectService.SearchProjectsWithoutPager(model.SelectedOrgId, model.SearchName, !model.IncludeInActive);
 
             await model.CalculatePlans(model.Year, projects, _projectService, _planService);
 

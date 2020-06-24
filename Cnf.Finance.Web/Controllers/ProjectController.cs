@@ -28,13 +28,21 @@ namespace Cnf.Finance.Web.Controllers
             var allowAllOrgs = Helper.AllowAllOrgs(HttpContext, out int? allowedOrgId);
             if (!allowAllOrgs)
                 model.SelectedOrgId = allowedOrgId;
+            if (model.PageSize <= 0)
+                model.PageSize = 5;
 
             var orgnizations = allowAllOrgs ? await _systemService.GetOrganizations() :
                                 new Organization[] { await _systemService.FindOrganization(allowedOrgId.Value) };
 
-            model.Projects = (await _projectService.SearchProjects(
-                        model.SelectedOrgId, model.SearchName, !model.IncludeInActive))
-                        .Select(p => ProjectViewModel.Create(p, orgnizations));
+            SearchResult<Project> searchResult = await _projectService.SearchProjects(
+                        model.SelectedOrgId, model.SearchName, !model.IncludeInActive, model.PageIndex, model.PageSize);
+
+            model.Pages = searchResult.Total == 0 ? 1
+                                  : (searchResult.Total % model.PageSize == 0 ? searchResult.Total / model.PageSize
+                                                        : searchResult.Total / model.PageSize + 1
+                                    );
+
+            model.Projects = searchResult.Records.Select(p => ProjectViewModel.Create(p, orgnizations));
 
             ViewBag.OrgList = new SelectList(orgnizations,
                 nameof(Organization.OrganizationId), nameof(Organization.Name));

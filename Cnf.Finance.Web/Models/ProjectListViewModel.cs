@@ -18,6 +18,13 @@ namespace Cnf.Finance.Web.Models
         [Display(Name ="包含已关闭")]
         public bool IncludeInActive { get; set; }
 
+        public int Pages { get; set; }
+
+        public int PageIndex { get; set; }
+
+        [Display(Name ="每页条数")]
+        public int PageSize { get; set; }
+
         public IEnumerable<ProjectViewModel> Projects { get; set; }
     }
 }

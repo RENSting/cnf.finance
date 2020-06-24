@@ -42,7 +42,7 @@ namespace Cnf.Finance.Web.Controllers
 
 
             //TODO: 帅选满足条件的项目
-            var projects = await _projectService.SearchProjects(model.SelectedOrgId, model.SearchName, !model.IncludeInActive);
+            var projects = await _projectService.SearchProjectsWithoutPager(model.SelectedOrgId, model.SearchName, !model.IncludeInActive);
 
             await model.CalculatePerforms(model.Year, projects, _projectService, _performService);
 

@@ -41,6 +41,17 @@ namespace Cnf.Finance.Web.Services
         const string FORMAT_QUERYSTRING_GET_BALANCE = "projectId={0}&year={1}";
         const string FORMAT_QUERYSTRING_GET_BALANCE_PRJs = "year={0}&projectIds={1}";
 
+        // GET: api/Projects/SearchProject
+        //  query string : ?orgId=&searchName=&activeOnly=&pageIndex=&pageSize=
+        //      orgId       :   Organization filter
+        //      searchName  :   Project Name filter
+        //      activeOnly  :   bool
+        //      pageIndex   :   int based=0
+        //      pageSize    :   int default=10
+        const string ROUTE_PAGED_PROJECTS = "api/Projects/SearchProject";
+        const string FORMAT_QUERYSTRING_PAGED_PROJECTS = "orgId={0}&searchName={1}&activeOnly={2}&pageIndex={3}&pageSize={4}";
+
+
         // GET: api/Terms
         // GET: api/Terms/5
         // PUT: api/Terms/5
@@ -54,10 +65,16 @@ namespace Cnf.Finance.Web.Services
             _apiConnector = apiConnector;
         }
 
-        public async Task<IEnumerable<Project>> SearchProjects(
+        public async Task<IEnumerable<Project>> SearchProjectsWithoutPager(
             int? orgId = default, string searchName = default, bool? activeOnly = default) =>
             await _apiConnector.HttpGetAsync<IEnumerable<Project>>(ROUTE_PROJECT,
                     string.Format(FORMAT_QUERYSTRING_SEARCH_PROJECT, orgId, HttpUtility.UrlEncode(searchName), activeOnly));
+
+        public async Task<SearchResult<Project>> SearchProjects(
+            int? orgId = default, string searchName = default, bool? activeOnly = default,
+            int pageIndex = 0, int pageSize = 10) =>
+            await _apiConnector.HttpGetAsync<SearchResult<Project>>(ROUTE_PAGED_PROJECTS,
+                    string.Format(FORMAT_QUERYSTRING_PAGED_PROJECTS, orgId, HttpUtility.UrlEncode(searchName), activeOnly, pageIndex, pageSize));
 
         public async Task<Project> FindProject(int projectId) => 
             await _apiConnector.HttpGetAsync<Project>(ROUTE_PROJECT + $"/{projectId}");

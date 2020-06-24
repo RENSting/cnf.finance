@@ -9,7 +9,8 @@ namespace Cnf.Finance.Web.Services
 {
     public interface IProjectService
     {
-        Task<IEnumerable<Project>> SearchProjects(int? orgId = default, string searchName = default, bool? activeOnly = default);
+        Task<IEnumerable<Project>> SearchProjectsWithoutPager(int? orgId = default, string searchName = default, bool? activeOnly = default);
+        Task<SearchResult<Project>> SearchProjects(int? orgId = default, string searchName = default, bool? activeOnly = default, int pageIndex=0, int pageSize=10);
         Task CreateProject(Project project);
         Task<Project> FindProject(int projectId);
         /// <summary>
