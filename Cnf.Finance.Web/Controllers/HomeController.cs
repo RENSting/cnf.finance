@@ -163,7 +163,7 @@ namespace Cnf.Finance.Web.Controllers
             if (!allowAllOrgs)
                 model.SelectedOrgId = allowedOrgId;
             if (model.PageSize <= 0)
-                model.PageSize = 3;
+                model.PageSize = 5;
 
             var orgnizations = allowAllOrgs ? await _systemService.GetOrganizations() :
                                 new Organization[] { await _systemService.FindOrganization(allowedOrgId.Value) };

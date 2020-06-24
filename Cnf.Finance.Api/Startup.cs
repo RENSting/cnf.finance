@@ -28,6 +28,10 @@ namespace Cnf.Finance.Api
         {
             services.AddDbContext<FinanceContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("FinanceManagement")));
+                        ////fix bug for EF Core work in SQL Server 2008
+                        ////  : by default, when using Skip().Take() for paged query, EF Core generate SQL with FETCH & NEXT,
+                        ////  :   but in SQL Server 2008, thus keywords weren't been supported
+                        //optionsBuilder => optionsBuilder.UseRowNumberForPaging(true)));
 
             services.AddControllers();
         }

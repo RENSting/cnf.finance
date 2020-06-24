@@ -65,7 +65,10 @@ namespace Cnf.Finance.Api.Controllers
             }
             else
             {
-                result.Records = await query.Skip(pageSize * pageIndex).Take(pageSize).ToListAsync();
+                // TODO: 这是一个假分页，由于SQL Server 2008不支持 FETCH/NEXT 语句，因此只好先读取全部记录，然后再内存中分页。
+                // TODO: Google到在Startup类中UserSqlSer服务时，配置options.UserRowNumberForPaging()来兼容2005/2008，但是测试后似乎没有用。
+                // TODO: 还需要进一步探讨。暂时先采用此低效能方法
+                result.Records = (await query.ToListAsync()).Skip(pageSize * pageIndex).Take(pageSize);
             }
             return result;
         }
